@@ -174,3 +174,12 @@
 .ant-tooltip-arrow {
   margin-top: 1px !important;
 }
+
+.ant-switch-inner {
+  background: $CF2;
+  border: none !important;
+}
+
+.ant-switch-checked ::before {
+  background: $C20 !important;
+}

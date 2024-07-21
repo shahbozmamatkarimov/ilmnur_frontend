@@ -20,6 +20,14 @@ export default defineNuxtConfig({
           rel: "stylesheet",
           href: "https://cdn.ckeditor.com/ckeditor5/33.0.0/classic/ckeditor.css",
         },
+        {
+          rel: "stylesheet",
+          href: "https://unpkg.com/cloudinary-video-player@1.5.9/dist/cld-video-player.min.css",
+        },
+        {
+          rel: "stylesheet",
+          href: "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css",
+        },
       ],
       script: [
         // {
@@ -28,6 +36,21 @@ export default defineNuxtConfig({
         // {
         //   src: "../node_modules/@ckeditor/ckeditor5-vue/dist/ckeditor.js",
         // },
+        {
+          src: "https://unpkg.com/cloudinary-core@latest/cloudinary-core-shrinkwrap.min.js",
+        },
+        {
+          src: "https://unpkg.com/cloudinary-video-player@1.5.9/dist/cld-video-player.min.js",
+        },
+        {
+          src: "https://unpkg.com/@cloudinary/js-streaming/dist/js-streaming.js",
+        },
+        {
+          src: "https://unpkg.com/peerjs@1.3.1/dist/peerjs.min.js",
+        },
+        {
+          src: "https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.3.1/peerjs.min.js.map",
+        },
       ],
       meta: [
         {
@@ -102,7 +125,9 @@ export default defineNuxtConfig({
   // plugins: ["~/plugins/ckeditor.js"],
   // plugins: ["~/plugins/quill-editor.js"],
   plugins: [
+    { src: "~/plugins/webrtc.client.ts", mode: "client" },
     "~/plugins/cloudinary.js",
+    "~/plugins/global.client.js",
     // { src: '~/plugins/primevue.js', ssr: false }
   ],
   postcss: {
@@ -132,4 +157,7 @@ export default defineNuxtConfig({
       realtimeURL: process.env.REALTIME_URL,
     },
   },
+  // build: {
+  //   transpile: ["vue-webrtc"],
+  // },
 });

@@ -26,19 +26,6 @@
             <img class="ml-2" src="@/assets/svg/icon/arrow.svg" alt="" />
           </template>
         </a-select>
-        <!-- <div class="tabs overflow-x-auto">
-            <a-tabs
-              class="hidden md:block min-w-fit"
-              v-model:activeKey="useLesson.store.class"
-            >
-              <a-tab-pane
-                v-for="(i, index) in classes"
-                class="tab1"
-                :key="index + 1"
-                :tab="i"
-              ></a-tab-pane>
-            </a-tabs>
-          </div> -->
       </div>
     </section>
     <section
@@ -88,14 +75,14 @@
                 <div class="flex items-center _c92 mt-[6px] mb-5 gap-4">
                   <div class="flex gap-[10px]">
                     <img src="@/assets/svg/lessons/start_btn.svg" alt="" />
-                    {{ i.coursesCount[index] }}
+                    {{ i.coursesCount }}
                   </div>
                   <div class="flex items-center gap-[10px]">
                     <img src="@/assets/svg/lessons/clock.svg" alt="" />
                     <p class="flex gap-1">
                       <span
                         v-for="i in formatSecondsToHours(
-                          i.totalDuration[index]
+                          i.totalDuration
                         )"
                         >{{ i }}</span
                       >
@@ -122,10 +109,10 @@
                 <div class="_c92 full_flex absolute flex-col min-w-fit">
                   <h1 class="text-[10px] _c92">Barchasi</h1>
                   <div class="text-center">
-                    <p class="black_24 text-xl">2</p>
+                    <p class="black_24 text-xl">{{i.finished_step}}</p>
                     <hr class="border-[#929292]" />
                     <p class="text-sm px-2 mt-1 _c92">
-                      {{ i.lessonsCount[index] }}
+                      {{ i.coursesCount }}
                     </p>
                   </div>
                 </div>

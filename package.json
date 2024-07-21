@@ -29,12 +29,14 @@
     "axios": "^1.6.8",
     "calendar": "^0.1.1",
     "cloudinary-core": "^2.13.1",
+    "global": "^4.4.0",
     "html-to-pdf": "^0.1.11",
     "html2canvas": "^1.4.1",
     "jspdf": "^2.5.1",
     "mammoth": "^1.7.1",
     "mathlive": "^0.98.6",
     "nuxt-swiper": "^1.2.2",
+    "peerjs": "^1.5.4",
     "pinia": "^2.1.7",
     "primeicons": "^6.0.1",
     "primevue": "^3.48.1",
@@ -43,6 +45,7 @@
     "socket.io-client": "^4.7.4",
     "swiper": "^11.0.7",
     "vue-drawing-canvas": "^1.0.14",
+    "vue-webrtc": "^2.0.0",
     "vue3-apexcharts": "^1.5.2",
     "vue3-chessboard": "^1.3.3"
   }

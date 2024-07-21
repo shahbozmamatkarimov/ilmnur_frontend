@@ -29,12 +29,19 @@ export const useCourseStore = defineStore("course", () => {
     price: "",
     discount: "",
     subject_id: "",
+    published: false,
+    type: "public",
+    file: {
+      file: "",
+      url: "",
+    },
   });
 
   const modal = reactive({
     create: false,
     edit: false,
     delete: false,
+    join: false,
   });
 
   function clearData() {
@@ -137,8 +144,18 @@ export const useCourseStore = defineStore("course", () => {
     }
     const token = localStorage.getItem("token");
     isLoading.addLoading("uploading");
+    const formData = new FormData();
+    for (let i in create) {
+      formData.append(i, create[i]);
+    }
+    formData.delete("file");
+    formData.append("file", create.file.file);
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}: ${value}`);
+    }
+
     axios
-      .post(baseUrl + `course/create`, create, {
+      .post(baseUrl + `course/create`, formData, {
         headers: {
           Authorization: "Bearer " + token,
         },

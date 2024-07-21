@@ -2,6 +2,20 @@
   <main
     class="sidebar courses_view bg-white md:p-8 p-4 pt-6 sm:rounded-[6px] overflow-hidden overflow-y-auto md:max-h-[calc(100vh_-_160px)] md:min-h-[calc(100vh_-_160px)] max-h-[calc(100vh_-_135px)] min-h-[calc(100vh_-_135px)]"
   >
+    <nav class="flex justify-between jusfiy-between mb-4">
+      <ul class="flex -space-x-1 my-2 overflow-hidden overflow-x-auto">
+        <li v-for="user in 10">
+          <img
+            v-if="true"
+            class="h-7 w-7 rounded-full object-cover"
+            src="@/assets/image/course.png"
+            alt=""
+          />
+          <UiAvatarEmpty v-else class="max-w-[28px] max-h-[28px]" />
+        </li>
+      </ul>
+      <button @click="$router.push('/video_chat')" class="buttons login_btn full_flex">Join chat</button>
+    </nav>
     <section>
       <div class="flex items-center justify-between">
         <div
@@ -35,8 +49,15 @@
           v-show="i.user_step != 0"
           class="lesson_shadow p-2 rounded-[10px] cursor-pointer"
         >
-          <div @click="() => routeToLessons(i.id)">
+          <div @click="() => routeToLessonModal(i.id)">
             <img
+              v-if="i.image"
+              class="rounded-[24px] h-[160px] w-full object-cover"
+              :src="i.image"
+              alt=""
+            />
+            <img
+              v-else
               class="rounded-[24px] h-[160px] w-full object-cover"
               src="@/assets/image/course.png"
               alt=""
@@ -114,12 +135,28 @@
                   </a-menu>
                 </template>
               </a-dropdown>
-              <div @click="() => routeToLessons(i.id)">
-                <img
-                  class="rounded-[24px] h-[160px] w-full object-cover"
-                  src="@/assets/image/course.png"
-                  alt=""
-                />
+              <div @click="() => routeToLessonModal(i.id)">
+                <div class="relative rounded-[24px] overflow-hidden">
+                  <div
+                    v-if="i.type == 'private'"
+                    class="absolute h-[160px] bg-black bg-opacity-50 w-full full_flex flex-col space-y-3 white"
+                  >
+                    <img src="@/assets/svg/icon/lock.svg" alt="" />
+                    <p>Private course</p>
+                  </div>
+                  <img
+                    v-if="i.image"
+                    class="rounded-[24px] h-[160px] w-full object-cover"
+                    :src="i.image"
+                    alt=""
+                  />
+                  <img
+                    v-else
+                    class="rounded-[24px] h-[160px] w-full object-cover"
+                    src="@/assets/image/course.png"
+                    alt=""
+                  />
+                </div>
                 <div>
                   <h1 class="font-bold uppercase mt-1 mb-2">
                     {{ i.name }}
@@ -168,7 +205,7 @@
 
     <!-- create -->
     <a-modal
-      class="max-w-[440px]"
+      class="max-w-[50%] min-w-[50%]"
       v-model:open="useCourse.modal.create"
       centered
     >
@@ -177,6 +214,17 @@
           <span v-if="useCourse.modal.edit">Kursni tahrirlash</span
           ><span v-else>Kurs qo'shish</span>
         </h1>
+        <div class="flex items-center gap-6">
+          <p
+            v-if="useCourse.create.published"
+            class="text-[16px] _c07 font-medium"
+          >
+            Published
+          </p>
+          <p v-else class="text-[16px] font-medium">Draft</p>
+          <!-- <el-switch v-model="useCourse.create.published" class="ml-2" /> -->
+          <a-switch class="!w-5" v-model:checked="useCourse.create.published" />
+        </div>
       </div>
       <form
         class="space-y-5 _c45 mt-[30px]"
@@ -218,10 +266,78 @@
             type="number"
           />
         </div>
-        <div class="full_flex flex-col py-16 b_cf2 rounded-xl text-sm">
+        <div class="grid grid-cols-3 gap-4">
+          <label
+            for="free"
+            class="full_flex !justify-between gap-5 border_ced r_8 py-3 px-6"
+          >
+            <div>
+              <p>Free</p>
+              <p>Free course for all</p>
+            </div>
+            <input
+              v-model="useCourse.create.type"
+              type="radio"
+              value="free"
+              name="type"
+              id="free"
+              class="h-5 w-5"
+            />
+          </label>
+          <label
+            for="paid"
+            class="full_flex !justify-between gap-5 border_ced r_8 py-3 px-6"
+          >
+            <div>
+              <p>Paid</p>
+              <p>Paid course for join</p>
+            </div>
+            <input
+              v-model="useCourse.create.type"
+              type="radio"
+              value="paid"
+              name="type"
+              id="paid"
+              class="h-5 w-5"
+            />
+          </label>
+          <label
+            for="private"
+            class="full_flex !justify-between gap-5 border_ced r_8 py-3 px-6"
+          >
+            <div>
+              <p>Private</p>
+              <p>You need to access to show</p>
+            </div>
+            <input
+              v-model="useCourse.create.type"
+              type="radio"
+              value="private"
+              name="type"
+              id="private"
+              class="h-5 w-5"
+            />
+          </label>
+        </div>
+        <img
+          v-if="useCourse.create.file.url"
+          :src="useCourse.create.file.url"
+          class="h-10 w-full object-cover"
+        />
+        <label
+          v-else
+          for="upload_photo"
+          class="full_flex flex-col py-16 b_cf2 rounded-xl text-sm"
+        >
           <img src="@/assets/svg/icon/add_image.svg" alt="" />
           <p>Add a photo</p>
-        </div>
+        </label>
+        <input
+          @change="handleFileUpload"
+          type="file"
+          id="upload_photo"
+          class="input_file !-mt-16"
+        />
         <UiButton
           type="submit"
           v-loading="isLoading.isLoadingType('updateSubject')"
@@ -240,6 +356,36 @@
           <Loading />
         </UiButton>
       </form>
+    </a-modal>
+
+    <!-- Join to course -->
+    <a-modal class="max-w-[440px]" v-model:open="useCourse.modal.join" centered>
+      <div class="flex justify-between items-center w-full mb-4">
+        <h1 class="font-semibold text-2xl">Kursga qo'shilish</h1>
+      </div>
+      <div>
+        <img
+          class="rounded-[24px] h-[160px] w-full object-cover"
+          src="@/assets/image/course.png"
+          alt=""
+        />
+        <div>
+          <h1 class="font-bold uppercase mt-1 mb-2">Uchburchaklar</h1>
+          <p>
+            <span class="_c32 font-bold text-xl mr-1">$25</span
+            ><span class="_c32 opacity-60 line-through">$24</span>
+          </p>
+        </div>
+        <UiButton
+          @click="routeToLessons"
+          v-if="isLoading.user.data.current_role == 'teacher'"
+          class="login_btn w-full mt-4"
+          >Add lesson</UiButton
+        >
+        <UiButton @click="routeToLessons" v-else class="login_btn w-full mt-4"
+          >Join to group</UiButton
+        >
+      </div>
     </a-modal>
 
     <!-- delete -->
@@ -332,10 +478,23 @@ function deleteCourse(id) {
   useCourse.modal.delete = true;
 }
 
-function routeToLessons(id) {
+function handleFileUpload(e) {
+  const file = e.target.files[0];
+  const url = URL.createObjectURL(file);
+  useCourse.create.file = { file, url };
+}
+
+function routeToLessonModal(id) {
+  useCourse.store.course_id = id;
+  useCourse.modal.join = true;
+}
+
+function routeToLessons() {
   const current_route = router.currentRoute.value;
   const subject_id = current_route.params.subject_id;
-  router.push(`/subjects/${subject_id}/courses/${id}/lessons`);
+  router.push(
+    `/subjects/${subject_id}/courses/${useCourse.store.course_id}/lessons`
+  );
 }
 
 function changeSlide() {
