@@ -20,6 +20,7 @@
                       <input v-model="useAuth.login.password" type="password" class="pr-10">
                       <img class="absolute top-0 right-0 p-4 cursor-pointer" src="@/assets/svg/icon/show.svg" alt="">
                   </div>
+                  <router-link to="/reset-password" class="inline-block mt-2 orange hover:underline">Parolni unutdingizmi?</router-link>
               </div>
               <div class="pt-2 space-y-6 grid">
                   <button class="login_btn mx-auto">Kirish</button>

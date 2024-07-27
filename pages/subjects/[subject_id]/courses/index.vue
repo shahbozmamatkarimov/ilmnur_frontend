@@ -14,7 +14,12 @@
           <UiAvatarEmpty v-else class="max-w-[28px] max-h-[28px]" />
         </li>
       </ul>
-      <button @click="$router.push('/video_chat')" class="buttons login_btn full_flex">Join chat</button>
+      <button
+        @click="$router.push('/video_chat')"
+        class="buttons login_btn full_flex"
+      >
+        Join chat
+      </button>
     </nav>
     <section>
       <div class="flex items-center justify-between">
@@ -38,22 +43,21 @@
     >
       <UiFullLoading v-for="i in 6" class="!h-[168px]" />
     </section>
-    <section v-else-if="useCourse.store.subjects?.length">
+    <section v-else-if="useCourse.store.membership?.length">
       <h1 class="text-xl font-bold">Complete your Course</h1>
       <p class="mt-1 mb-5 _c92">
         We know the best things for You. Top picks for You.
       </p>
-      <div class="grid grid-cols-3">
+      <div class="grid xl:grid-cols-3 gap-5 mt-3">
         <div
-          v-for="i in useCourse.store.courses"
-          v-show="i.user_step != 0"
+          v-for="i in useCourse.store.membership"
           class="lesson_shadow p-2 rounded-[10px] cursor-pointer"
         >
-          <div @click="() => routeToLessonModal(i.id)">
+          <div @click="() => routeToLessonModal(i)">
             <img
-              v-if="i.image"
+              v-if="i.courses.image"
               class="rounded-[24px] h-[160px] w-full object-cover"
-              :src="i.image"
+              :src="i.courses.image"
               alt=""
             />
             <img
@@ -64,9 +68,12 @@
             />
             <div>
               <h1 class="font-bold uppercase mt-1 mb-2">
-                {{ i.name }}
+                {{ i.courses.name }}
               </h1>
-              <el-progress class="class_progress mb-2 mt-6" :percentage="45" />
+              <el-progress
+                class="class_progress mb-2 mt-6"
+                :percentage="i.user_step"
+              />
               <p class="_c92 text-sm mb-1">
                 {{ i.user_step }}/{{ i.lesson_count }} Videos Completed
               </p>
@@ -85,123 +92,139 @@
           </div>
         </div>
       </div>
-      <div
-        class="flex items-center gap-2 whitespace-nowrap overflow-x-auto my-10"
+    </section>
+    <div
+      class="flex items-center gap-2 whitespace-nowrap overflow-x-auto my-10"
+    >
+      <button
+        class="full_flex sticky left-0 rounded-xl bg-[#FF852E] px-2 py-2 text-sm orange border_orange w-9 h-9"
       >
-        <button
-          v-for="i in 10"
-          class="rounded-xl px-4 py-2 text-sm orange border_orange"
+        <svg
+          width="32"
+          height="32"
+          viewBox="0 0 32 32"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
         >
-          All Recommendation
-        </button>
-      </div>
-      <h1 class="text-xl font-bold">Trending Course</h1>
-      <p class="mt-1 mb-5 _c92">
-        We know the best things for You. Top picks for You.
-      </p>
-      <swiper
-        @mousewheel="mouseSlider"
-        @slider-move="changeSlide"
-        :watchSlidesProgress="true"
-        :slidesPerView="1"
-        :spaceBetween="30"
-        :pagination="{ clickable: true }"
-        class="mySwiper md:mt-[18px] mt-2"
-        :modules="modules"
+          <path
+            d="M16 2V30M2 16H30"
+            stroke="#FFF"
+            stroke-width="4"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </button>
+      <button
+        v-for="i in 10"
+        class="rounded-xl px-4 py-2 text-sm orange border_orange"
       >
-        <swiper-slide :id="i" v-for="(i, index) in 11">
-          <section class="grid xl:grid-cols-3 gap-5 mt-3 pb-20">
-            <div
-              v-for="i in useCourse.store.courses"
-              v-show="i.user_step == 0"
-              class="relative lesson_shadow p-2 rounded-[10px] cursor-pointer"
+        All Recommendation
+      </button>
+    </div>
+    <h1 class="text-xl font-bold">Trending Course</h1>
+    <p class="mt-1 mb-5 _c92">
+      We know the best things for You. Top picks for You.
+    </p>
+    <swiper
+      @mousewheel="mouseSlider"
+      @slider-move="changeSlide"
+      :watchSlidesProgress="true"
+      :slidesPerView="1"
+      :spaceBetween="30"
+      :pagination="{ clickable: true }"
+      class="mySwiper md:mt-[18px] mt-2"
+      :modules="modules"
+    >
+      <swiper-slide :id="i" v-for="(i, index) in 11">
+        <section class="grid xl:grid-cols-3 gap-5 mt-3 pb-20">
+          <div
+            v-for="i in useCourse.store.courses"
+            v-show="i.user_step == 0"
+            class="relative lesson_shadow p-2 rounded-[10px] cursor-pointer"
+          >
+            <a-dropdown
+              class="absolute top-4 right-4 bg-white rounded-md py-1 h-6 w-6"
+              :trigger="['click']"
+              placement="bottomRight"
             >
-              <a-dropdown
-                class="absolute top-4 right-4 bg-white rounded-md py-1 h-6 w-6"
-                :trigger="['click']"
-                placement="bottomRight"
-              >
+              <img
+                class="cursor-pointer min-w-[20px]"
+                src="@/assets/svg/icon/threedot_black.svg"
+                alt=""
+              />
+              <template #overlay>
+                <a-menu>
+                  <a-menu-item @click="editCourse(i)">Edit</a-menu-item>
+                  <a-menu-item @click="deleteCourse(i.id)">Delete</a-menu-item>
+                </a-menu>
+              </template>
+            </a-dropdown>
+            <div @click="() => routeToLessonModal(i)">
+              <div class="relative rounded-[24px] overflow-hidden">
+                <div
+                  v-if="i.type == 'private'"
+                  class="absolute h-[160px] bg-black bg-opacity-50 w-full full_flex flex-col space-y-3 white"
+                >
+                  <img src="@/assets/svg/icon/lock.svg" alt="" />
+                  <p>Private course</p>
+                </div>
                 <img
-                  class="cursor-pointer min-w-[20px]"
-                  src="@/assets/svg/icon/threedot_black.svg"
+                  v-if="i.image"
+                  class="rounded-[24px] h-[160px] w-full object-cover"
+                  :src="i.image"
                   alt=""
                 />
-                <template #overlay>
-                  <a-menu>
-                    <a-menu-item @click="editCourse(i)">Edit</a-menu-item>
-                    <a-menu-item @click="deleteCourse(i.id)"
-                      >Delete</a-menu-item
-                    >
-                  </a-menu>
-                </template>
-              </a-dropdown>
-              <div @click="() => routeToLessonModal(i.id)">
-                <div class="relative rounded-[24px] overflow-hidden">
-                  <div
-                    v-if="i.type == 'private'"
-                    class="absolute h-[160px] bg-black bg-opacity-50 w-full full_flex flex-col space-y-3 white"
+                <img
+                  v-else
+                  class="rounded-[24px] h-[160px] w-full object-cover"
+                  src="@/assets/image/course.png"
+                  alt=""
+                />
+              </div>
+              <div>
+                <h1 class="font-bold uppercase mt-1 mb-2">
+                  {{ i.name }}
+                </h1>
+                <p
+                  class="line-clamp-3 _c32 text-sm !font-light mb-1 leading-[18px] h-[54px]"
+                >
+                  {{ i.description }}
+                </p>
+                <p>
+                  <span class="_c32 font-bold text-xl mr-1">${{ i.price }}</span
+                  ><span class="_c32 opacity-60 line-through"
+                    >${{ i.discount }}</span
                   >
-                    <img src="@/assets/svg/icon/lock.svg" alt="" />
-                    <p>Private course</p>
-                  </div>
-                  <img
-                    v-if="i.image"
-                    class="rounded-[24px] h-[160px] w-full object-cover"
-                    :src="i.image"
-                    alt=""
-                  />
-                  <img
-                    v-else
-                    class="rounded-[24px] h-[160px] w-full object-cover"
-                    src="@/assets/image/course.png"
-                    alt=""
-                  />
-                </div>
-                <div>
-                  <h1 class="font-bold uppercase mt-1 mb-2">
-                    {{ i.name }}
-                  </h1>
-                  <p
-                    class="line-clamp-3 _c32 text-sm !font-light mb-1 leading-[18px] h-[54px]"
-                  >
-                    {{ i.description }}
-                  </p>
-                  <p>
-                    <span class="_c32 font-bold text-xl mr-1"
-                      >${{ i.price }}</span
-                    ><span class="_c32 opacity-60 line-through"
-                      >${{ i.discount }}</span
-                    >
-                  </p>
-                  <div class="flex gap-2 my-1">
-                    <p class="h-7 px-2 b_cf2 full_flex r_8">226k Members</p>
-                    <p class="h-7 px-2 b_cf2 full_flex r_8">Paid</p>
-                    <p class="h-7 px-2 b_cf2 full_flex r_8">Online</p>
-                  </div>
-                  <ul
-                    class="flex -space-x-1 my-2 overflow-hidden overflow-x-auto"
-                  >
-                    <li v-for="user in i.users">
-                      <img
-                        v-if="user.image"
-                        class="h-7 w-7 rounded-full object-cover"
-                        :src="user.image"
-                        alt=""
-                      />
-                      <UiAvatarEmpty v-else class="max-w-[28px] max-h-[28px]" />
-                    </li>
-                  </ul>
-                </div>
+                </p>
+                <!-- <div class="flex gap-2 my-1">
+                  <p class="h-7 px-2 b_cf2 full_flex r_8">226k Members</p>
+                  <p class="h-7 px-2 b_cf2 full_flex r_8">Paid</p>
+                  <p class="h-7 px-2 b_cf2 full_flex r_8">Online</p>
+                </div> -->
+                <ul
+                  class="flex -space-x-1 my-2 overflow-hidden overflow-x-auto"
+                >
+                  <li v-for="user in i.course_members">
+                    <img
+                      v-if="user.role.image"
+                      class="h-7 w-7 rounded-full object-cover"
+                      :src="user.role.image"
+                      alt=""
+                    />
+                    <UiAvatarEmpty v-else class="max-w-[28px] max-h-[28px]" />
+                  </li>
+                </ul>
               </div>
             </div>
-          </section>
-        </swiper-slide>
-      </swiper>
-    </section>
-    <section class="full_flex h-full py-20 flex-col space-y-4" v-else>
+          </div>
+        </section>
+      </swiper-slide>
+    </swiper>
+    <!-- <section class="full_flex h-full py-20 flex-col space-y-4">
       <img class="h-20" src="@/assets/svg/icon/not_found.svg" alt="" />
       <p>Hech qanday kurslar topilmadi</p>
-    </section>
+    </section> -->
 
     <!-- create -->
     <a-modal
@@ -246,24 +269,6 @@
             class="rounded-[12px]"
             id="description"
             type="text"
-          />
-        </div>
-        <div class="space-y-2">
-          <label for="price">Kurs narxi</label>
-          <input
-            v-model="useCourse.create.price"
-            class="rounded-[12px]"
-            id="price"
-            type="number"
-          />
-        </div>
-        <div class="space-y-2">
-          <label for="discount">Chegirma</label>
-          <input
-            v-model="useCourse.create.discount"
-            class="rounded-[12px]"
-            id="discount"
-            type="number"
           />
         </div>
         <div class="grid grid-cols-3 gap-4">
@@ -319,15 +324,33 @@
             />
           </label>
         </div>
+        <div v-if="useCourse.create.type == 'paid'" class="space-y-2">
+          <label for="price">Kurs narxi</label>
+          <input
+            v-model="useCourse.create.price"
+            class="rounded-[12px]"
+            id="price"
+            type="number"
+          />
+        </div>
+        <div v-if="useCourse.create.type == 'paid'" class="space-y-2">
+          <label for="discount">Chegirma</label>
+          <input
+            v-model="useCourse.create.discount"
+            class="rounded-[12px]"
+            id="discount"
+            type="number"
+          />
+        </div>
         <img
           v-if="useCourse.create.file.url"
           :src="useCourse.create.file.url"
-          class="h-10 w-full object-cover"
+          class="max-w-[300px] h-[160px] rounded-xl w-full object-cover"
         />
         <label
           v-else
           for="upload_photo"
-          class="full_flex flex-col py-16 b_cf2 rounded-xl text-sm"
+          class="full_flex flex-col py-16 b_cf2 max-w-[300px] h-[160px] rounded-xl text-sm"
         >
           <img src="@/assets/svg/icon/add_image.svg" alt="" />
           <p>Add a photo</p>
@@ -363,28 +386,139 @@
       <div class="flex justify-between items-center w-full mb-4">
         <h1 class="font-semibold text-2xl">Kursga qo'shilish</h1>
       </div>
-      <div>
+      <!-- <div>
         <img
           class="rounded-[24px] h-[160px] w-full object-cover"
           src="@/assets/image/course.png"
           alt=""
         />
-        <div>
-          <h1 class="font-bold uppercase mt-1 mb-2">Uchburchaklar</h1>
-          <p>
-            <span class="_c32 font-bold text-xl mr-1">$25</span
-            ><span class="_c32 opacity-60 line-through">$24</span>
-          </p>
+      -->
+      <div>
+        <div class="relative rounded-[24px] overflow-hidden">
+          <div
+            v-if="store.course_data.type == 'private'"
+            class="absolute h-[160px] bg-black bg-opacity-50 w-full full_flex flex-col space-y-3 white"
+          >
+            <img src="@/assets/svg/icon/lock.svg" alt="" />
+            <p>Private course</p>
+          </div>
+          <img
+            v-if="store.course_data.image"
+            class="rounded-[24px] h-[160px] w-full object-cover"
+            :src="store.course_data.image"
+            alt=""
+          />
+          <img
+            v-else
+            class="rounded-[24px] h-[160px] w-full object-cover"
+            src="@/assets/image/course.png"
+            alt=""
+          />
         </div>
+        <div>
+          <h1 class="font-bold uppercase mt-1 mb-2">
+            {{ store.course_data.name }}
+          </h1>
+          <p
+            class="line-clamp-3 _c32 text-sm !font-light mb-1 leading-[18px] h-[54px]"
+          >
+            {{ store.course_data.description }}
+          </p>
+          <p>
+            <span class="_c32 font-bold text-xl mr-1"
+              >${{ store.course_data.price }}</span
+            ><span class="_c32 opacity-60 line-through"
+              >${{ store.course_data.discount }}</span
+            >
+          </p>
+          <!-- <div class="flex gap-2 my-1">
+            <p class="h-7 px-2 b_cf2 full_flex r_8">226k Members</p>
+            <p class="h-7 px-2 b_cf2 full_flex r_8">Paid</p>
+            <p class="h-7 px-2 b_cf2 full_flex r_8">Online</p>
+          </div> -->
+          <ul class="flex -space-x-1 my-2 overflow-hidden overflow-x-auto">
+            <li v-for="user in store.course_data.course_members">
+              <img
+                v-if="user.role.image"
+                class="h-7 w-7 rounded-full object-cover"
+                :src="user.role.image"
+                alt=""
+              />
+              <UiAvatarEmpty v-else class="max-w-[28px] max-h-[28px]" />
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div>
         <UiButton
+          v-if="store.course_data.type == 'free'"
           @click="routeToLessons"
-          v-if="isLoading.user.data.current_role == 'teacher'"
           class="login_btn w-full mt-4"
-          >Add lesson</UiButton
-        >
-        <UiButton @click="routeToLessons" v-else class="login_btn w-full mt-4"
           >Join to group</UiButton
         >
+        <UiButton
+          v-else-if="store.course_data.type == 'paid'"
+          @click="routeToLessons"
+          class="login_btn w-full mt-4"
+          >Adminga yozish</UiButton
+        >
+        <a-dropdown
+          v-else-if="store.course_data.type == 'private'"
+          :trigger="['click']"
+          class="!max-h-[80vh]"
+          v-model:open="store.visible"
+          placement="top"
+        >
+          <UiButton class="login_btn w-full mt-4">Add member</UiButton>
+          <template #overlay>
+            <a-menu
+              class="!max-h-[50vh] !-mb-14 relative overflow-hidden overflow-y-auto space-y-0.5"
+            >
+              <input
+                @input="useUser.searchUsers"
+                id="search_user"
+                type="text"
+                v-model="useUser.store.search_input"
+                class="sticky top-0 z-10 mb-2"
+                placeholder="Search"
+              />
+              <a-menu-item
+                @click="addMember(user.role[0]?.id)"
+                v-for="user in useUser.store.search_users"
+                :class="
+                  useCourse.addmember.role_id.includes(user.role[0]?.id)
+                    ? 'bg_orange !text-white'
+                    : ''
+                "
+              >
+                <ul class="flex items-center gap-2">
+                  <li>
+                    <img
+                      v-if="user.role[0]?.image"
+                      class="h-8 w-8 rounded-full object-cover"
+                      :src="user.role[0]?.image"
+                      alt=""
+                    />
+                    <UiAvatarEmpty v-else class="max-w-[32px] max-h-[32px]" />
+                  </li>
+                  <li>{{ user.name }} {{ user.surname }}</li>
+                </ul>
+              </a-menu-item>
+              {{ useCourse.addmember.role_id }}
+              <div class="flex">
+                <UiButton class="w-full mt-4" @click="store.visible = false"
+                  >Cancel</UiButton
+                >
+                <UiButton
+                  v-loading="isLoading.isLoadingType('addMember')"
+                  @click="useCourse.addMember"
+                  class="login_btn w-full mt-4"
+                  >Add</UiButton
+                >
+              </div>
+            </a-menu>
+          </template>
+        </a-dropdown>
       </div>
     </a-modal>
 
@@ -416,9 +550,8 @@
 definePageMeta({
   layout: "search",
 });
-import { useCourseStore } from "@/store";
 import { useFormatter } from "@/composables";
-import { useLoadingStore } from "@/store";
+import { useLoadingStore, useCourseStore, useUserStore } from "@/store";
 // Import Swiper Vue.js components
 import { Swiper, SwiperSlide } from "swiper/vue";
 import { Pagination } from "swiper/modules";
@@ -432,6 +565,7 @@ const modules = [Pagination];
 const { formatSecondsToHours } = useFormatter();
 
 const useCourse = useCourseStore();
+const useUser = useUserStore();
 const isLoading = useLoadingStore();
 const router = useRouter();
 await useAsyncData(() => {
@@ -462,7 +596,19 @@ const classes = [
 const store = reactive({
   reyting: 50,
   mouse_wheel: 0,
+  course_data: {},
+  visible: false,
 });
+
+function addMember(id) {
+  if (useCourse.addmember.role_id.includes(id)) {
+    const index = useCourse.addmember.role_id.indexOf(id);
+    console.log(index);
+    useCourse.addmember.role_id.splice(index, index + 1);
+  } else {
+    useCourse.addmember.role_id.push(id);
+  }
+}
 
 function editCourse(data) {
   useCourse.store.course_id = data.id;
@@ -484,8 +630,10 @@ function handleFileUpload(e) {
   useCourse.create.file = { file, url };
 }
 
-function routeToLessonModal(id) {
-  useCourse.store.course_id = id;
+function routeToLessonModal(data) {
+  useCourse.store.course_id = data.id;
+  useCourse.addmember.course_id = data.id;
+  store.course_data = data;
   useCourse.modal.join = true;
 }
 

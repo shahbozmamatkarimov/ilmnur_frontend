@@ -45,6 +45,12 @@ export const useAuthStore = defineStore("auth", () => {
     password: "",
   });
 
+  const reset_pass = reactive({
+    new_password: "",
+    confirm_password: "",
+    activation_link: "",
+  });
+
   function getUserFullInfo() {
     isLoading.addLoading("getUserFullInfo");
     console.log("user data");
@@ -53,9 +59,9 @@ export const useAuthStore = defineStore("auth", () => {
       .then((res: any): void => {
         console.log(res, "user data");
         if (res.data.statusCode == 200) {
-          isLoading.middleware.passwordChecking = false;
+          // isLoading.middleware.passwordChecking = false;
           isLoading.user.data = res.data.data;
-          isLoading.store.socket = io(realtimeUrl, {
+          isLoading.store.socket = io("http://localhost:4000", {
             reconnectionDelayMax: 10000000, // Maximum delay between reconnection attempts (milliseconds)
             reconnectionAttempts: 5,
             query: {
@@ -116,7 +122,21 @@ export const useAuthStore = defineStore("auth", () => {
         console.log(res);
         localStorage.setItem("token", res.data.token);
         if (res.data.statusCode == 200) {
-          router.push("/reyting")
+          router.push("/reyting");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+
+  function resetPassword() {
+    apiRequest
+      .post("resetpassword/create", { email: login.email })
+      .then((res: any) => {
+        console.log(res);
+        if (res.status == 201) {
+          router.push("/verify-email");
         }
       })
       .catch((err) => {
@@ -149,7 +169,27 @@ export const useAuthStore = defineStore("auth", () => {
       .then((res: any) => {
         console.log(res);
         if (res.data.message == "User activated successfully") {
-          router.push("/");
+          router.push("/verify-email");
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        if (err.response?.data?.message == "User already activated") {
+          showMessage("Email", "Allaqachon ro'yhatdan o'tilgan");
+        }
+      });
+  }
+
+  function authResetPass() {
+    reset_pass.activation_link = String(
+      router.currentRoute.value.query.activation_link
+    );
+    axios
+      .put(baseUrl + `user/newPassword`, reset_pass)
+      .then((res: any) => {
+        console.log(res);
+        if (res.status == 200) {
+          router.push("/login");
         }
       })
       .catch((err) => {
@@ -206,10 +246,13 @@ export const useAuthStore = defineStore("auth", () => {
     create,
     getUserFullInfo,
     getRegions,
+    reset_pass,
     register,
     login,
     authLogin,
     authRegister,
     authActivateLink,
+    resetPassword,
+    authResetPass,
   };
 });

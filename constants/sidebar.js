@@ -26,6 +26,15 @@ export const sidebar = [
   },
   {
     id: 1,
+    name: "To'lovlar",
+    url: "/payments",
+    svg: _lesson,
+    // svgActive: dashboardActive,
+    // role: ["admin"],
+    role: [],
+  },
+  {
+    id: 1,
     name: "Uslubiy birlashma",
     url: "/methodological_association",
     svg: _lesson,

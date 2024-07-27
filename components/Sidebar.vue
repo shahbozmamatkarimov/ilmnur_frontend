@@ -175,7 +175,7 @@ function changeRole(index) {
   isLoading.user.current_role_step = index + 1;
   isLoading.user.current_role_data = isLoading.user.data.role[index];
   isLoading.user.data.current_role = isLoading.user.current_role_data.role;
-  isLoading.middleware.passwordChecking = false;
+  // isLoading.middleware.passwordChecking = false;
 }
 
 function addAccount() {

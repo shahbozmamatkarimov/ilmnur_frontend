@@ -2,12 +2,8 @@
   <header class="max-w-[2000px] mx-auto">
     <NuxtLoadingIndicator />
     <LoadingPage v-if="isLoading.middleware.loading" />
-    <Password v-else-if="!isLoading.middleware.passwordChecking" />
-    <div
-      v-show="
-        !isLoading.middleware.loading && isLoading.middleware.passwordChecking
-      "
-    >
+    <!-- <Password v-else-if="!isLoading.middleware.passwordChecking" /> -->
+    <div v-show="!isLoading.middleware.loading">
       <SearchNav
         :class="
           is_sidebar.includes($router.currentRoute.value.name)

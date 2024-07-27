@@ -27,6 +27,8 @@ export const useUserStore = defineStore("User", () => {
     children: [],
     otp: "",
     total_count: {},
+    search_input: "",
+    search_users: [],
   });
 
   const create = reactive({
@@ -156,7 +158,7 @@ export const useUserStore = defineStore("User", () => {
       .then((res) => {
         console.log(res);
         if (res.data.statusCode == 200) {
-          isLoading.middleware.passwordChecking = true;
+          // isLoading.middleware.passwordChecking = true;
           isLoading.user.current_role_data =
             isLoading.user.data.role[isLoading.user.current_role_step - 1];
           store.password = "";
@@ -178,7 +180,7 @@ export const useUserStore = defineStore("User", () => {
     axios
       .get(
         baseUrl +
-          `role/getByRole/${create.role}/${isLoading.user.data.current_role}`,
+          `role/getByRole/${create.role}`,
         {
           headers: {
             Authorization: "Bearer " + token,
@@ -195,6 +197,38 @@ export const useUserStore = defineStore("User", () => {
       .then((res) => {
         console.log(res);
         store.getall = res.data.data;
+        isLoading.removeLoading("getAllUsers");
+      })
+      .catch((err) => {
+        console.log(err);
+        // showMessage("Xato", "Nimadir xato ketdi");
+        isLoading.removeLoading("getAllUsers");
+      });
+  }
+
+  function searchUsers() {
+    isLoading.addLoading("getAllUsers");
+    const token = localStorage.getItem("token");
+    axios
+      .get(
+        baseUrl +
+          `user/searchusers/${store.search_input}/1`,
+        {
+          headers: {
+            Authorization: "Bearer " + token,
+          },
+          onDownloadProgress: (progressEvent) => {
+            store.progress = Math.round(
+              (progressEvent.loaded / progressEvent.total) * 100
+            );
+            console.log(store.progress);
+            // setUploadPercentage(progress);
+          },
+        }
+      )
+      .then((res) => {
+        console.log(res);
+        store.search_users = res.data.data.records;
         isLoading.removeLoading("getAllUsers");
       })
       .catch((err) => {
@@ -348,5 +382,6 @@ export const useUserStore = defineStore("User", () => {
     getChildren,
     deleteUser,
     countUsers,
+    searchUsers,
   };
 });

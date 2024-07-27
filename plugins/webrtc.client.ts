@@ -36,5 +36,5 @@
 //   nuxtApp.vueApp.component('VueWebRTC', VueWebRTC)
 // })
 
-import { VueWebRTC } from 'vue-webrtc'
-Vue.component(VueWebRTC.name, VueWebRTC)
+import WebRTC from 'vue-webrtc'
+Vue.component(WebRTC.name, WebRTC);

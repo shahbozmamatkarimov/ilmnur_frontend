@@ -19,6 +19,7 @@ export const useCourseStore = defineStore("course", () => {
     course_id: "",
     user_step: {},
     courseById: [],
+    membership: [],
     class: 1,
     createModal: false,
   });
@@ -42,6 +43,11 @@ export const useCourseStore = defineStore("course", () => {
     edit: false,
     delete: false,
     join: false,
+  });
+
+  const addmember = reactive({
+    course_id: "",
+    role_id: [],
   });
 
   function clearData() {
@@ -98,6 +104,7 @@ export const useCourseStore = defineStore("course", () => {
         if (res.data.statusCode == 200) {
           console.log(res, "==d=skdls");
           store.courses = res.data.data;
+          store.membership=res.data.membership;
           store.user_step = res.data.step?.data.pop();
         } else {
           store.courses = [];
@@ -146,7 +153,9 @@ export const useCourseStore = defineStore("course", () => {
     isLoading.addLoading("uploading");
     const formData = new FormData();
     for (let i in create) {
-      formData.append(i, create[i]);
+      if (create[i] !== "") {
+        formData.append(i, create[i]);
+      }
     }
     formData.delete("file");
     formData.append("file", create.file.file);
@@ -170,6 +179,36 @@ export const useCourseStore = defineStore("course", () => {
         console.log(err);
         // openNotification(err?.response?.data?.message);
         isLoading.removeLoading("uploading");
+      });
+  }
+
+  function addMember() {
+    if (!addmember.role_id?.length) {
+      return;
+    }
+    // create.subject_id = router.currentRoute.value.params.subject_id;
+    // if (modal.edit) {
+    //   return updateCourse();
+    // }
+    const token = localStorage.getItem("token");
+    isLoading.addLoading("addMember");
+    console.log(addmember);
+    axios
+      .post(baseUrl + `course_member/create`, addmember, {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+      })
+      .then((res) => {
+        console.log(res);
+        modal.create = false;
+        getCourses();
+        isLoading.removeLoading("addMember");
+      })
+      .catch((err) => {
+        console.log(err);
+        // openNotification(err?.response?.data?.message);
+        isLoading.removeLoading("addMember");
       });
   }
 
@@ -220,6 +259,7 @@ export const useCourseStore = defineStore("course", () => {
   return {
     store,
     create,
+    addmember,
     modal,
     getSubjects,
     getCourses,
@@ -227,5 +267,6 @@ export const useCourseStore = defineStore("course", () => {
     createCourse,
     clearData,
     deleteCourse,
+    addMember,
   };
 });

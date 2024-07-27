@@ -9,7 +9,7 @@ export const useChatStore = defineStore("chat", () => {
   const realtimeUrl = runtime.public.realtimeURL;
   const isLoading = useLoadingStore();
   console.log(realtimeUrl);
-  const socket = io(realtimeUrl, {
+  const socket = io("http://localhost:4000", {
     reconnectionDelayMax: 10000000, // Maximum delay between reconnection attempts (milliseconds)
     reconnectionAttempts: 5,
     query: {

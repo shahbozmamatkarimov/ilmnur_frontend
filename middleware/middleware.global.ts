@@ -12,6 +12,8 @@ export default defineNuxtRouteMiddleware(async (to: any, from) => {
     "new_password",
     "error",
     "index",
+    "change-password",
+    "reset-password",
   ]?.includes(to.name);
   const useAuth = useAuthStore();
   const isLoading = useLoadingStore();
