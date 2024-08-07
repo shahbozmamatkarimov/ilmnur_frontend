@@ -91,8 +91,8 @@ function changeLesson(data, index, is_route) {
   }
 }
 
-onBeforeMount(() => {
-  useLesson.getLessons("lessons_list");
+onBeforeMount(async () => {
+  await useLesson.getLessons("lessons_list");
 });
 </script>
 

@@ -19,6 +19,7 @@
         </div>
         <div>
           <UiButton
+          v-if="isLoading.user.data.current_role == 'teacher'"
             @click="useLesson.modal.create = true"
             class="bg_orange font-semibold white !px-6"
             >Qo'shish</UiButton
@@ -178,12 +179,15 @@
                     src="@/assets/svg/lessons/step_solved.svg"
                     alt=""
                   />
-                    <!-- v-else-if="
+                  <!-- v-else-if="
                       useLesson.store.user_step?.lesson_id + 1 ==
                         useLesson.store.lessons[index]?.id || index == 0
                     " -->
-                  <img 
-                  v-else-if="useLesson.store.lessons[index -  1]?.user_step || index == 0"
+                  <img
+                    v-else-if="
+                      useLesson.store.lessons[index - 1]?.user_step ||
+                      index == 0
+                    "
                     class="mx-auto w-6 h-6"
                     src="@/assets/svg/lessons/step_pending.svg"
                     alt=""
@@ -204,9 +208,7 @@
                     />
                     <template #overlay>
                       <a-menu>
-                        <a-menu-item @click="editLesson(i)"
-                          >Edit</a-menu-item
-                        >
+                        <a-menu-item @click="editLesson(i)">Edit</a-menu-item>
                         <a-menu-item @click="deleteLesson(i.id, index)"
                           >Delete</a-menu-item
                         >
@@ -242,6 +244,40 @@
             id="name"
             type="text"
           />
+        </div>
+        <div class="grid grid-cols-2 gap-4 w-full">
+          <label
+            for="free"
+            class="full_flex !justify-between gap-5 border_ced r_8 py-3 px-6"
+          >
+            <div>
+              <p>Darslik</p>
+            </div>
+            <input
+              v-model="useLesson.create.type"
+              type="radio"
+              :value="false"
+              name="type"
+              id="free"
+              class="h-5 w-5"
+            />
+          </label>
+          <label
+            for="paid"
+            class="full_flex !justify-between gap-5 border_ced r_8 py-3 px-6"
+          >
+            <div>
+              <p>Test</p>
+            </div>
+            <input
+              v-model="useLesson.create.type"
+              type="radio"
+              :value="true"
+              name="type"
+              id="paid"
+              class="h-5 w-5"
+            />
+          </label>
         </div>
         <UiButton
           @click="useLesson.store.createModal = false"
@@ -346,14 +382,11 @@ if (isNaN(router.currentRoute.value.query.class)) {
 }
 
 function navigateToNext(e, data, index, is_route) {
-  // if (
-  //   !e.target.className.includes("threedot_dropdown") &&
-  //   (is_route || index == 0)
-  // ) {
-    router.push(
-      `${router.currentRoute.value.path}/${data.id}?class=${router.currentRoute.value.query.class}`
-    );
-  // }
+  if (
+    !e.target.className.includes("threedot_dropdown")
+  ) {
+    router.push(`${router.currentRoute.value.path}/${data.id}`);
+  }
 }
 
 watch(

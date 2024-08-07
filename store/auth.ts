@@ -98,6 +98,9 @@ export const useAuthStore = defineStore("auth", () => {
       .catch((err) => {
         isLoading.middleware.loading = false;
         console.log(err);
+        if (err.response.data.message == "User not found!") {
+          localStorage.removeItem("token");
+        }
         const isRoute = [
           "login",
           "register",

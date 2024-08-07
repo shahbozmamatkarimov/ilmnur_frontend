@@ -6,8 +6,8 @@
       class="flex items-center justify-between p-5 border-b border-[#EDEDED]"
     >
       <button class="font-semibold text-xl">O‘qituvchilar</button>
+      <!-- v-if="isLoading.user.data.current_role == 'methodological'" -->
       <UiButton
-        v-if="isLoading.user.data.current_role == 'methodological'"
         @click="useUser.store.createModal = true"
         class="bg_orange font-semibold white !px-6"
         >Qo‘shish</UiButton
@@ -23,8 +23,7 @@
             <th class="text-start font-medium _c66 px-5 py-3">
               O‘quvchilar soni
             </th>
-            <th class="text-start font-medium _c66 px-5 py-3">Telefon raqam</th>
-            <th class="text-start font-medium _c66 px-5 py-3">Sinflari</th>
+            <th class="text-start font-medium _c66 px-5 py-3">Email</th>
             <th
               v-if="isLoading.user.data.current_role != 'methodological'"
               class="text-start font-medium _c66 px-5 py-3"
@@ -55,21 +54,16 @@
             <td class="py-6 px-5">
               <div class="flex items-center h-full gap-2">
                 <UiAvatarEmpty class="max-h-[32px] max-w-[32px]" />
-                {{ i.full_name }}
+                {{ i.user?.name }}
+                {{ i.user?.surname }}
               </div>
             </td>
             <td class="py-6 px-5">
               <p v-for="subject in i.subjects">{{ subject }}</p>
             </td>
             <td class="py-6 px-5">12</td>
-            <td class="py-6 px-5">{{ i.user?.phone }}</td>
+            <td class="py-6 px-5">{{ i.user?.email }}</td>
             <td class="py-6 px-5">
-              <div v-for="i in i.class">{{ i[0] }} - {{ i[1] }}</div>
-            </td>
-            <td
-              v-if="isLoading.user.data.current_role != 'methodological'"
-              class="py-6 px-5"
-            >
               <UiStatus :status="1" />
             </td>
             <td class="py-6 px-5">{{ formateCreatedAt(i.createdAt) }}</td>
@@ -99,10 +93,8 @@
                   alt=""
               /></ui-button>
             </td>
-            <td
-              v-if="isLoading.user.data.current_role == 'methodological'"
-              class="py-6 px-5"
-            >
+            <!-- v-if="isLoading.user.data.current_role == 'admin'" -->
+            <td class="py-6 px-5">
               <a-dropdown :trigger="['click']">
                 <img
                   class="cursor-pointer min-w-[20px]"
@@ -111,9 +103,9 @@
                 />
                 <template #overlay>
                   <a-menu>
-                    <!-- <a-menu-item @click="editTeacher(index, i.id)"
+                    <a-menu-item @click="editTeacher(index, i.id)"
                       >Edit</a-menu-item
-                    > -->
+                    >
                     <a-menu-item @click="useUser.deleteUser(i.id, index)"
                       >Delete</a-menu-item
                     >
@@ -152,25 +144,21 @@ const isLoading = useLoadingStore();
 useUser.store.getall = [];
 useUser.create.role = "teacher";
 
-useUser.getAll();
+onBeforeMount(() => {
+  useUser.getAll();
+});
 
 function editTeacher(index, id) {
-  useUser.store.user_id = id;
+  useUser.store.role_id = id;
   useUser.store.createModal = true;
   useUser.store.is_update = true;
   useUser.create = Object.assign({}, useUser.store.getall[index]);
-  useUser.create.phone = useUser.store.getall[index].user?.phone;
   const subjects = useUser.store.getall[index].subjects;
-  const classes = useUser.store.getall[index].class;
-  useUser.create.subjects = Object.assign(
-    [],
-    subjects.length ? subjects : [null]
-  );
-  useUser.create.class = Object.assign(
-    [],
-    classes.length ? JSON.parse(JSON.stringify(classes)) : [[null, null]]
-  );
+  useUser.create.subjects = Object.assign([], subjects?.length ? subjects : []);
   useUser.create.role = "teacher";
+  useUser.create.email = useUser.store.getall[index].user.email;
+  useUser.create.name = useUser.store.getall[index].user.name;
+  useUser.create.surname = useUser.store.getall[index].user.surname;
   useUser.store.subject_step = Object.keys(useUser.create.subjects)?.length;
 }
 </script>

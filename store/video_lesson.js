@@ -15,9 +15,8 @@ export const useVideoLessonStore = defineStore("videolesson", () => {
   function getById() {
     isLoading.addLoading("getLessonById");
     const id = router.currentRoute.value.params.id;
-    const class_name = router.currentRoute.value.query.class;
     axios
-      .get(baseUrl + `lesson/getById/${id}/${class_name}`)
+      .get(baseUrl + `lesson/getById/${id}`)
       .then((res) => {
         console.log(res);
         if (res.data.statusCode == 200) {

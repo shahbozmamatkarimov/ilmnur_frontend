@@ -1,5 +1,6 @@
 <template>
   <div class="main">
+    <vue-webrtc id="dkslkds"></vue-webrtc>
     <div class="main__left">
       <div class="main__videos">
         <div id="video-grid"></div>

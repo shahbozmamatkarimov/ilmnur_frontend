@@ -22,7 +22,7 @@
       </button>
     </nav>
     <section>
-      <div class="flex items-center justify-between">
+      <div class="flex items-center justify-between py-2">
         <div
           @click="$router.back()"
           class="flex items-center gap-4 cursor-pointer max-w-fit"
@@ -31,6 +31,7 @@
           <h2 class="md:text-xl font-semibold">Kurslar</h2>
         </div>
         <UiButton
+          v-if="isLoading.user.data.current_role == 'teacher'"
           @click="useCourse.modal.create = true"
           class="bg_orange font-semibold white !px-6"
           >Qo‘shish</UiButton
@@ -53,7 +54,7 @@
           v-for="i in useCourse.store.membership"
           class="lesson_shadow p-2 rounded-[10px] cursor-pointer"
         >
-          <div @click="() => routeToLessonModal(i)">
+          <div @click="() => routeToLessonModal(i.courses, 'member')">
             <img
               v-if="i.courses.image"
               class="rounded-[24px] h-[160px] w-full object-cover"
@@ -93,7 +94,7 @@
         </div>
       </div>
     </section>
-    <div
+    <!-- <div
       class="flex items-center gap-2 whitespace-nowrap overflow-x-auto my-10"
     >
       <button
@@ -121,12 +122,12 @@
       >
         All Recommendation
       </button>
-    </div>
-    <h1 class="text-xl font-bold">Trending Course</h1>
+    </div> -->
+    <h1 class="text-xl font-bold mt-8">Trending Course</h1>
     <p class="mt-1 mb-5 _c92">
       We know the best things for You. Top picks for You.
     </p>
-    <swiper
+    <!-- <swiper
       @mousewheel="mouseSlider"
       @slider-move="changeSlide"
       :watchSlidesProgress="true"
@@ -136,91 +137,90 @@
       class="mySwiper md:mt-[18px] mt-2"
       :modules="modules"
     >
-      <swiper-slide :id="i" v-for="(i, index) in 11">
-        <section class="grid xl:grid-cols-3 gap-5 mt-3 pb-20">
-          <div
-            v-for="i in useCourse.store.courses"
-            v-show="i.user_step == 0"
-            class="relative lesson_shadow p-2 rounded-[10px] cursor-pointer"
-          >
-            <a-dropdown
-              class="absolute top-4 right-4 bg-white rounded-md py-1 h-6 w-6"
-              :trigger="['click']"
-              placement="bottomRight"
+      <swiper-slide :id="i" v-for="(i, index) in 11"> -->
+    <section class="grid xl:grid-cols-3 gap-5 mt-3 pb-20">
+      <div
+        v-for="i in useCourse.store.courses"
+        v-show="i.user_step == 0"
+        class="relative lesson_shadow p-2 rounded-[10px] cursor-pointer"
+      >
+        <a-dropdown
+          v-if="isLoading.user.data.current_role == 'teacher'"
+          class="absolute top-4 right-4 bg-white rounded-md py-1 h-6 w-6"
+          :trigger="['click']"
+          placement="bottomRight"
+        >
+          <img
+            class="cursor-pointer min-w-[20px] z-10"
+            src="@/assets/svg/icon/threedot_black.svg"
+            alt=""
+          />
+          <template #overlay>
+            <a-menu>
+              <a-menu-item @click="editCourse(i)">Edit</a-menu-item>
+              <a-menu-item @click="deleteCourse(i.id)">Delete</a-menu-item>
+            </a-menu>
+          </template>
+        </a-dropdown>
+        <div @click="() => routeToLessonModal(i)">
+          <div class="relative rounded-[24px] overflow-hidden">
+            <div
+              v-if="i.type == 'private'"
+              class="absolute h-[160px] bg-black bg-opacity-50 w-full full_flex flex-col space-y-3 white"
             >
-              <img
-                class="cursor-pointer min-w-[20px]"
-                src="@/assets/svg/icon/threedot_black.svg"
-                alt=""
-              />
-              <template #overlay>
-                <a-menu>
-                  <a-menu-item @click="editCourse(i)">Edit</a-menu-item>
-                  <a-menu-item @click="deleteCourse(i.id)">Delete</a-menu-item>
-                </a-menu>
-              </template>
-            </a-dropdown>
-            <div @click="() => routeToLessonModal(i)">
-              <div class="relative rounded-[24px] overflow-hidden">
-                <div
-                  v-if="i.type == 'private'"
-                  class="absolute h-[160px] bg-black bg-opacity-50 w-full full_flex flex-col space-y-3 white"
-                >
-                  <img src="@/assets/svg/icon/lock.svg" alt="" />
-                  <p>Private course</p>
-                </div>
-                <img
-                  v-if="i.image"
-                  class="rounded-[24px] h-[160px] w-full object-cover"
-                  :src="i.image"
-                  alt=""
-                />
-                <img
-                  v-else
-                  class="rounded-[24px] h-[160px] w-full object-cover"
-                  src="@/assets/image/course.png"
-                  alt=""
-                />
-              </div>
-              <div>
-                <h1 class="font-bold uppercase mt-1 mb-2">
-                  {{ i.name }}
-                </h1>
-                <p
-                  class="line-clamp-3 _c32 text-sm !font-light mb-1 leading-[18px] h-[54px]"
-                >
-                  {{ i.description }}
-                </p>
-                <p>
-                  <span class="_c32 font-bold text-xl mr-1">${{ i.price }}</span
-                  ><span class="_c32 opacity-60 line-through"
-                    >${{ i.discount }}</span
-                  >
-                </p>
-                <!-- <div class="flex gap-2 my-1">
+              <img src="@/assets/svg/icon/lock.svg" alt="" />
+              <p>Private course</p>
+            </div>
+            <img
+              v-if="i.image"
+              class="rounded-[24px] h-[160px] w-full object-cover"
+              :src="i.image"
+              alt=""
+            />
+            <img
+              v-else
+              class="rounded-[24px] h-[160px] w-full object-cover"
+              src="@/assets/image/course.png"
+              alt=""
+            />
+          </div>
+          <div>
+            <h1 class="font-bold uppercase mt-1 mb-2">
+              {{ i.name }}
+            </h1>
+            <p
+              class="line-clamp-3 _c32 text-sm !font-light mb-1 leading-[18px] h-[54px]"
+            >
+              {{ i.description }}
+            </p>
+            <p>
+              <span class="_c32 font-bold text-xl mr-1">${{ i.price }}</span
+              ><span class="_c32 opacity-60 line-through"
+                >${{ i.discount }}</span
+              >
+            </p>
+            <!-- <div class="flex gap-2 my-1">
                   <p class="h-7 px-2 b_cf2 full_flex r_8">226k Members</p>
                   <p class="h-7 px-2 b_cf2 full_flex r_8">Paid</p>
                   <p class="h-7 px-2 b_cf2 full_flex r_8">Online</p>
                 </div> -->
-                <ul
-                  class="flex -space-x-1 my-2 overflow-hidden overflow-x-auto"
-                >
-                  <li v-for="user in i.course_members">
-                    <img
-                      v-if="user.role.image"
-                      class="h-7 w-7 rounded-full object-cover"
-                      :src="user.role.image"
-                      alt=""
-                    />
-                    <UiAvatarEmpty v-else class="max-w-[28px] max-h-[28px]" />
-                  </li>
-                </ul>
-              </div>
-            </div>
+            <ul class="flex -space-x-1 my-2 overflow-hidden overflow-x-auto">
+              <li v-for="user in i.course_members">
+                <img
+                  v-if="user.role.image"
+                  class="h-7 w-7 rounded-full object-cover"
+                  :src="user.role.image"
+                  alt=""
+                />
+                <UiAvatarEmpty v-else class="max-w-[28px] max-h-[28px]" />
+              </li>
+            </ul>
           </div>
-        </section>
-      </swiper-slide>
-    </swiper>
+        </div>
+      </div>
+    </section>
+    <!-- </swiper-slide>
+    </swiper> -->
     <!-- <section class="full_flex h-full py-20 flex-col space-y-4">
       <img class="h-20" src="@/assets/svg/icon/not_found.svg" alt="" />
       <p>Hech qanday kurslar topilmadi</p>
@@ -342,11 +342,12 @@
             type="number"
           />
         </div>
-        <img
-          v-if="useCourse.create.file.url"
-          :src="useCourse.create.file.url"
-          class="max-w-[300px] h-[160px] rounded-xl w-full object-cover"
-        />
+        <label v-if="useCourse.create.file?.url" for="upload_photo">
+          <img
+            :src="useCourse.create.file?.url"
+            class="max-w-[300px] h-[160px] rounded-xl w-full object-cover"
+          />
+        </label>
         <label
           v-else
           for="upload_photo"
@@ -454,7 +455,8 @@
           v-if="store.course_data.type == 'free'"
           @click="routeToLessons"
           class="login_btn w-full mt-4"
-          >Join to group</UiButton
+          ><span v-if="store.is_member">Continue</span
+          ><span v-else>Join to group</span></UiButton
         >
         <UiButton
           v-else-if="store.course_data.type == 'paid'"
@@ -598,6 +600,7 @@ const store = reactive({
   mouse_wheel: 0,
   course_data: {},
   visible: false,
+  is_member: false,
 });
 
 function addMember(id) {
@@ -615,6 +618,8 @@ function editCourse(data) {
   for (let i in useCourse.create) {
     useCourse.create[i] = data[i];
   }
+  useCourse.create.file = {};
+  useCourse.create.file = { file: "", url: data.image };
   useCourse.modal.edit = true;
   useCourse.modal.create = true;
 }
@@ -630,7 +635,13 @@ function handleFileUpload(e) {
   useCourse.create.file = { file, url };
 }
 
-function routeToLessonModal(data) {
+function routeToLessonModal(data, type) {
+  console.log(data);
+  if (type == "member") {
+    store.is_member = true;
+  } else {
+    store.is_member = false;
+  }
   useCourse.store.course_id = data.id;
   useCourse.addmember.course_id = data.id;
   store.course_data = data;
@@ -638,11 +649,15 @@ function routeToLessonModal(data) {
 }
 
 function routeToLessons() {
-  const current_route = router.currentRoute.value;
-  const subject_id = current_route.params.subject_id;
-  router.push(
-    `/subjects/${subject_id}/courses/${useCourse.store.course_id}/lessons`
-  );
+  if (store.is_member) {
+    const current_route = router.currentRoute.value;
+    const subject_id = current_route.params.subject_id;
+    router.push(
+      `/subjects/${subject_id}/courses/${useCourse.store.course_id}/lessons`
+    );
+  } else {
+    useCourse.addMember("jointogroup");
+  }
 }
 
 function changeSlide() {

@@ -1,5 +1,5 @@
 import { useAuthStore } from "./auth";
-import { useLoadingStore } from "./loading"
+import { useLoadingStore } from "./loading";
 import { useUserStore } from "./user";
 import { useChatStore } from "./chat";
 import { useContentStore } from "./content_upload";
@@ -13,6 +13,7 @@ import { useSettingsStore } from "./settings";
 import { useClassStore } from "./class";
 import { useProfileStore } from "./profile";
 import { useNewsStore } from "./news";
+import { usePaymentStore } from "./payment";
 
 export {
   useAuthStore,
@@ -30,4 +31,5 @@ export {
   useProfileStore,
   useNewsStore,
   useCourseStore,
+  usePaymentStore,
 };

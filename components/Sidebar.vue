@@ -87,7 +87,6 @@
             </div>
           </div>
           <router-link
-            v-if="isLoading.user.data.current_role != 'student'"
             @click="addAccount"
             to="/register"
             class="flex gap-3 items-center mb-5 h-6 cursor-pointer _c55"

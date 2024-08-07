@@ -32,7 +32,7 @@
           class="bg-white"
         >
           <div
-            v-if="!isLoading.isLoadingType('getLessonById')"
+            v-if="!isLoading.isLoadingType('getLessonById') && useVideoLesson.store.video_lesson?.video_lesson[0].video"
             class="lessons xl:h-[312px] md:h-[270px] sm:h-[250px] h-[172px] sm:rounded-lg relative overflow-hidden"
           >
             <CldVideoPlayer

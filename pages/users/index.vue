@@ -184,17 +184,16 @@ const isLoading = useLoadingStore();
 const router = useRouter();
 const store = reactive({
   create: false,
-  classes: [["1", "A"]],
   mouse_wheel: 0,
   activeTab: 1,
 });
-const sinf = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-const sinf_type = ["A", "B", "C", "D", "E", "F", "G", "H", "I"];
 useUser.store.getall = [];
 useUser.create.role = ["super_admin"];
 useUser.countUsers();
 
-useUser.getAll();
+onBeforeMount(() => {
+  useUser.getAll();
+});
 
 function add_class() {
   const data = [];

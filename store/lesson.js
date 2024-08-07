@@ -26,6 +26,7 @@ export const useLessonStore = defineStore("lesson", () => {
   const create = reactive({
     title: "",
     course_id: "",
+    type: false,
   });
 
   const modal = reactive({
@@ -127,6 +128,15 @@ export const useLessonStore = defineStore("lesson", () => {
       .post(baseUrl + `lesson/create`, create)
       .then((res) => {
         console.log(res);
+        const subject_id = +router.currentRoute.value.params.subject_id;
+        const course_id = +router.currentRoute.value.params.course_id;
+        const lesson_id = res.data.data.id;
+        const video_lesson_id = res.data.video_lesson?.id;
+        if (video_lesson_id) {
+          router.push(`/create_test?lesson_id=${lesson_id}`)
+        }else {
+          router.push(`/subjects/${subject_id}/courses/${course_id}/lessons/${lesson_id}?create_lesson=true`)
+        }
         modal.create = false;
         getLessons();
         isLoading.removeLoading("uploading");

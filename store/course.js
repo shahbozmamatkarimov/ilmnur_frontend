@@ -104,7 +104,7 @@ export const useCourseStore = defineStore("course", () => {
         if (res.data.statusCode == 200) {
           console.log(res, "==d=skdls");
           store.courses = res.data.data;
-          store.membership=res.data.membership;
+          store.membership = res.data.membership;
           store.user_step = res.data.step?.data.pop();
         } else {
           store.courses = [];
@@ -182,10 +182,14 @@ export const useCourseStore = defineStore("course", () => {
       });
   }
 
-  function addMember() {
+  function addMember(type) {
+    if (type == "jointogroup") {
+      addmember.role_id = [isLoading.user.current_role_data.id];
+    }
     if (!addmember.role_id?.length) {
       return;
     }
+    console.log(addmember.role_id)
     // create.subject_id = router.currentRoute.value.params.subject_id;
     // if (modal.edit) {
     //   return updateCourse();
@@ -194,7 +198,7 @@ export const useCourseStore = defineStore("course", () => {
     isLoading.addLoading("addMember");
     console.log(addmember);
     axios
-      .post(baseUrl + `course_member/create`, addmember, {
+      .post(baseUrl + `coursemember/create`, addmember, {
         headers: {
           Authorization: "Bearer " + token,
         },
@@ -202,6 +206,13 @@ export const useCourseStore = defineStore("course", () => {
       .then((res) => {
         console.log(res);
         modal.create = false;
+        if (type == "jointogroup") {
+          const current_route = router.currentRoute.value;
+          const subject_id = current_route.params.subject_id;
+          router.push(
+            `/subjects/${subject_id}/courses/${store.course_id}/lessons`
+          );
+        }
         getCourses();
         isLoading.removeLoading("addMember");
       })

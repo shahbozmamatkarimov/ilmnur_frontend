@@ -6,12 +6,12 @@
       class="flex items-center justify-between p-5 border-b border-[#EDEDED]"
     >
       <button class="font-semibold text-xl">O‘quvchilar</button>
-      <!-- <UiButton
+      <UiButton
         v-if="isLoading.user.data.current_role == 'teacher'"
         @click="useUser.store.createModal = true"
         class="bg_orange font-semibold white !px-6"
         >Qo‘shish</UiButton
-      > -->
+      >
     </nav>
     <section class="overflow-x-auto">
       <table class="table-auto mt-5 w-full">
@@ -19,27 +19,16 @@
           <tr class="text-sm b_cff3 whitespace-nowrap">
             <th class="text-start font-medium _c66 px-5 py-3">№</th>
             <th class="text-start font-medium _c66 px-5 py-3">Ism</th>
-            <th class="text-start font-medium _c66 px-5 py-3">Fan</th>
-            <th class="text-start font-medium _c66 px-5 py-3">
-              O‘quvchilar soni
-            </th>
-            <th class="text-start font-medium _c66 px-5 py-3">Telefon raqam</th>
-            <th class="text-start font-medium _c66 px-5 py-3">Sinflari</th>
-            <th
-              v-if="isLoading.user.data.current_role != 'leader_teacher'"
-              class="text-start font-medium _c66 px-5 py-3"
-            >
-              Status
-            </th>
+            <th class="text-start font-medium _c66 px-5 py-3">Email</th>
+            <th class="text-start font-medium _c66 px-5 py-3">Status</th>
             <th class="text-start font-medium _c66 px-5 py-3">Yaratilgan</th>
             <th
-              v-if="isLoading.user.data.current_role == 'leader_teacher'"
+              v-if="isLoading.user.data.current_role == 'teacher'"
               class="px-5 py-3"
             ></th>
-            <th class="min-w-[60px] px-5 py-3"></th>
           </tr>
         </thead>
-        <tbody>
+        <tbody> 
           <tr
             class="border-b border-[#EDEDED] relative"
             :class="i.user_status == 'pending' ? 'bg-[#F6F6F6]' : ''"
@@ -55,17 +44,11 @@
             <td class="py-6 px-5">
               <div class="flex items-center h-full gap-2">
                 <UiAvatarEmpty class="max-h-[32px] max-w-[32px]" />
-                {{ i.full_name }}
+                {{ i.user.name }}
+                {{ i.user.surname }}
               </div>
             </td>
-            <td class="py-6 px-5">
-              <p v-for="subject in i.subjects">{{ subject }}</p>
-            </td>
-            <td class="py-6 px-5">12</td>
-            <td class="py-6 px-5">{{ i.user?.phone }}</td>
-            <td class="py-6 px-5">
-              <div v-for="i in i.class">{{ i[0] }} - {{ i[1] }}</div>
-            </td>
+            <td class="py-6 px-5">{{ i.user?.email }}</td>
             <td
               v-if="isLoading.user.data.current_role != 'leader_teacher'"
               class="py-6 px-5"
@@ -99,7 +82,10 @@
                   alt=""
               /></ui-button>
             </td>
-            <td class="py-6 px-5">
+            <td
+              v-if="isLoading.user.data.current_role == 'teacher'"
+              class="py-6 px-5"
+            >
               <a-dropdown :trigger="['click']">
                 <img
                   class="cursor-pointer"
@@ -147,7 +133,9 @@ const isLoading = useLoadingStore();
 useUser.store.getall = [];
 useUser.create.role = "student";
 
-useUser.getAll();
+onBeforeMount(() => {
+  useUser.getAll();
+});
 </script>
 
 <style lang="scss" scoped></style>

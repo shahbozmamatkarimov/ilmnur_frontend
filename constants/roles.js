@@ -5,40 +5,16 @@ export const roles = [
     role: "student",
     register: true,
   },
-  {
-    uz: "Ota-ona",
-    en: "Parents",
-    role: "parents",
-    register: true,
-  },
-  {
-    uz: "Rahbar",
-    en: "Leader teacher",
-    role: "leader_teacher",
-    register: true,
-  },
+  // {
+  //   uz: "Ota-ona",
+  //   en: "Parents",
+  //   role: "parents",
+  //   register: true,
+  // },
   {
     uz: "O'qituvchi",
     en: "Teacher",
     role: "teacher",
-    register: true,
-  },
-  {
-    uz: "Asosiy o'qituvchi",
-    en: "Main teacher",
-    role: "main_teacher",
-    register: false,
-  },
-  {
-    uz: "Uslubiy birlashma",
-    en: "Methodological association",
-    role: "methodological",
-    register: true,
-  },
-  {
-    uz: "Direktor",
-    en: "Director",
-    role: "director",
     register: true,
   },
   {

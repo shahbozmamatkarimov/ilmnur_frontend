@@ -29,22 +29,22 @@ export const useUserStore = defineStore("User", () => {
     total_count: {},
     search_input: "",
     search_users: [],
+    add_user_step: 0,
+    is_user_login: false,
+    role_id: "",
   });
 
   const create = reactive({
     name: "",
     surname: "",
-    region: null,
-    district: null,
-    school_number: null,
     subjects: [],
-    class: [[1, "A"]],
     role: "",
     secret_key: "",
     file: "",
-    code: [],
     deadline: new Date(),
-    phone: "",
+    email: "",
+    password: "",
+    user_id: "",
   });
 
   function sendOtp() {
@@ -69,25 +69,16 @@ export const useUserStore = defineStore("User", () => {
   }
 
   function register() {
-    const code = create.code.join("");
-    const phone = "+998" + create.phone.replace(/\D/g, "");
-    if (create.role == "admin") {
-      create.district = "null";
-      create.region = "null";
-    }
+    // const code = create.code.join("");
+    // const phone = "+998" + create.phone.replace(/\D/g, "");
     axios
-      .post(baseUrl + "user/register", {
-        ...create,
-        full_name: create.name + " " + create.surname,
-        code,
-        phone,
-      })
+      .post(baseUrl + "user/register", create)
       .then((res) => {
         console.log(res);
         if (res.data.statusCode == 200) {
           // showMessage("xato", "Telefon yoki parol xato");
           store.activeKey += 1;
-          localStorage.setItem("token", res.data.token);
+          // localStorage.setItem("token", res.data.token);
           create.name = null;
           create.surname = null;
           create.phone = null;
@@ -129,7 +120,7 @@ export const useUserStore = defineStore("User", () => {
   function update(data) {
     console.log(create);
     axios
-      .put(baseUrl + `role/update/${isLoading.user.data.id}`, data)
+      .put(baseUrl + `role/update/${isLoading.user.current_role_data.id}`, data)
       .then((res) => {
         console.log(res);
         if (res.data.statusCode == 200) {
@@ -141,6 +132,51 @@ export const useUserStore = defineStore("User", () => {
         getAll();
       })
       .catch((err) => {
+        console.log(err);
+        // openNotification(err?.response?.data?.message);
+        showMessage("Roleni o'zgartirish", "Muvaffaqiyatli o'zgartirildi");
+      });
+  }
+
+  function updateUser(data) {
+    console.log(data);
+    axios
+      .put(baseUrl + `role/update/${store.role_id}`, data)
+      .then((res) => {
+        console.log(res);
+        if (res.data.statusCode == 200) {
+          // openNotification(res.data.message);
+          store.activeKey += 1;
+        } else {
+          showMessage("Xato", "Telefon yoki parol xato");
+        }
+        getAll();
+      })
+      .catch((err) => {
+        console.log(err);
+        // openNotification(err?.response?.data?.message);
+        showMessage("Roleni o'zgartirish", "Muvaffaqiyatli o'zgartirildi");
+      });
+  }
+
+  function checkEmail() {
+    console.log(create);
+    isLoading.addLoading("checkEmail");
+    axios
+      .get(baseUrl + `user/checkemail/${create.email}`)
+      .then((res) => {
+        console.log(res);
+        store.is_user_login = true;
+        store.add_user_step = 1;
+        create.name = res.data.data.name
+        create.surname = res.data.data.surname
+        create.email = res.data.data.email
+        isLoading.removeLoading("checkEmail");
+      })
+      .catch((err) => {
+        isLoading.removeLoading("checkEmail");
+        store.is_user_login = false;
+        store.add_user_step = 1;
         console.log(err);
         // openNotification(err?.response?.data?.message);
         showMessage("Roleni o'zgartirish", "Muvaffaqiyatli o'zgartirildi");
@@ -178,22 +214,18 @@ export const useUserStore = defineStore("User", () => {
     isLoading.addLoading("getAllUsers");
     const token = localStorage.getItem("token");
     axios
-      .get(
-        baseUrl +
-          `role/getByRole/${create.role}`,
-        {
-          headers: {
-            Authorization: "Bearer " + token,
-          },
-          onDownloadProgress: (progressEvent) => {
-            store.progress = Math.round(
-              (progressEvent.loaded / progressEvent.total) * 100
-            );
-            console.log(store.progress);
-            // setUploadPercentage(progress);
-          },
-        }
-      )
+      .get(baseUrl + `role/getByRole/${create.role}`, {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+        onDownloadProgress: (progressEvent) => {
+          store.progress = Math.round(
+            (progressEvent.loaded / progressEvent.total) * 100
+          );
+          console.log(store.progress);
+          // setUploadPercentage(progress);
+        },
+      })
       .then((res) => {
         console.log(res);
         store.getall = res.data.data;
@@ -210,22 +242,18 @@ export const useUserStore = defineStore("User", () => {
     isLoading.addLoading("getAllUsers");
     const token = localStorage.getItem("token");
     axios
-      .get(
-        baseUrl +
-          `user/searchusers/${store.search_input}/1`,
-        {
-          headers: {
-            Authorization: "Bearer " + token,
-          },
-          onDownloadProgress: (progressEvent) => {
-            store.progress = Math.round(
-              (progressEvent.loaded / progressEvent.total) * 100
-            );
-            console.log(store.progress);
-            // setUploadPercentage(progress);
-          },
-        }
-      )
+      .get(baseUrl + `user/searchusers/${store.search_input}/1`, {
+        headers: {
+          Authorization: "Bearer " + token,
+        },
+        onDownloadProgress: (progressEvent) => {
+          store.progress = Math.round(
+            (progressEvent.loaded / progressEvent.total) * 100
+          );
+          console.log(store.progress);
+          // setUploadPercentage(progress);
+        },
+      })
       .then((res) => {
         console.log(res);
         store.search_users = res.data.data.records;
@@ -268,7 +296,7 @@ export const useUserStore = defineStore("User", () => {
     axios
       .post(baseUrl + `role/count_users`, users)
       .then((res) => {
-        console.log(res, '--------------------------------')
+        console.log(res, "--------------------------------");
         store.total_count = res.data.data;
         isLoading.removeLoading("countUsers");
       })
@@ -376,7 +404,9 @@ export const useUserStore = defineStore("User", () => {
     check,
     update,
     getAllStudent,
+    updateUser,
     updateStatus,
+    checkEmail,
     sendOtp,
     addChild,
     getChildren,

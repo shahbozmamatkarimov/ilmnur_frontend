@@ -8,6 +8,7 @@
       <div class="flex items-center justify-between">
         <h2 class="md:text-xl font-medium md:mt-[30px] mt-4">Fanlar</h2>
         <UiButton
+        v-if="isLoading.user.data.current_role == 'admin'"
           @click="useSubject.modal.create = true"
           class="bg_orange font-semibold white !px-6"
           >Qo‘shish</UiButton
