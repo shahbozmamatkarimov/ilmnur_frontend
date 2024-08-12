@@ -9,7 +9,10 @@
         alt=""
       />
       <div class="space-y-[10px]">
-        <h1 class="text-[#242424] text-xl font-[700]">{{ isLoading.user.current_role.full_name }}</h1>
+        <h1 class="text-[#242424] text-xl font-[700]">
+          {{ isLoading.user.data.name }}
+          {{ isLoading.user.data.surname }}
+        </h1>
         <div class="flex items-center gap-[10px] text-[#454545] text-sm">
           <img src="@/assets/svg/profile/clock.svg" alt="" />
           Ro'yxatdan o'tish: 2024 yil
@@ -57,11 +60,12 @@ definePageMeta({
   layout: "search",
 });
 
-import { useProfileStore } from "~/store";
+import { useProfileStore, useLoadingStore } from "~/store";
 import { Calendar } from "calendar";
 const cal = new Calendar(1);
 
 const useProfile = useProfileStore();
+const isLoading = useLoadingStore();
 useProfile.getActivity();
 
 const store = reactive({

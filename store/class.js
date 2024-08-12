@@ -121,19 +121,19 @@ export const useClassStore = defineStore("Class", () => {
       });
   }
 
-  isLoading.store.socket.on("request", (res) => {
-    console.log(res, "socket accepted");
-    if (res.type == "request") {
-      store.getall.push(res.data.data);
-    } else if (res.type == "accepted") {
-      for (let i in store.getall) {
-        if (res.data.data.id == store.getall[i].id) {
-          console.log(i);
-          store.getall[i] = res.data.data;
-        }
-      }
-    }
-  });
+  // isLoading.store.socket.on("request", (res) => {
+  //   console.log(res, "socket accepted");
+  //   if (res.type == "request") {
+  //     store.getall.push(res.data.data);
+  //   } else if (res.type == "accepted") {
+  //     for (let i in store.getall) {
+  //       if (res.data.data.id == store.getall[i].id) {
+  //         console.log(i);
+  //         store.getall[i] = res.data.data;
+  //       }
+  //     }
+  //   }
+  // });
 
   return {
     store,

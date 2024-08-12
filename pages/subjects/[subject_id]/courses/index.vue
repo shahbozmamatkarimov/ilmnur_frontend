@@ -2,7 +2,7 @@
   <main
     class="sidebar courses_view bg-white md:p-8 p-4 pt-6 sm:rounded-[6px] overflow-hidden overflow-y-auto md:max-h-[calc(100vh_-_160px)] md:min-h-[calc(100vh_-_160px)] max-h-[calc(100vh_-_135px)] min-h-[calc(100vh_-_135px)]"
   >
-    <nav class="flex justify-between jusfiy-between mb-4">
+    <!-- <nav class="flex justify-between jusfiy-between mb-4">
       <ul class="flex -space-x-1 my-2 overflow-hidden overflow-x-auto">
         <li v-for="user in 10">
           <img
@@ -20,7 +20,7 @@
       >
         Join chat
       </button>
-    </nav>
+    </nav> -->
     <section>
       <div class="flex items-center justify-between py-2">
         <div
@@ -31,7 +31,12 @@
           <h2 class="md:text-xl font-semibold">Kurslar</h2>
         </div>
         <UiButton
-          v-if="isLoading.user.data.current_role == 'teacher'"
+          v-if="
+            isLoading.user.data.current_role == 'teacher' &&
+            isLoading.user.current_role_data.subjects?.includes(
+              $router.currentRoute.value.params.subject_id
+            )
+          "
           @click="useCourse.modal.create = true"
           class="bg_orange font-semibold white !px-6"
           >Qo‘shish</UiButton
@@ -708,6 +713,10 @@ onMounted(() => {
   if (secondChild) {
     secondChild.click();
   }
+});
+
+onUnmounted(() => {
+  useCourse.modal.join = false;
 });
 </script>
 

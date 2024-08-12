@@ -8,9 +8,7 @@
       >
         <div
           @click="
-            $router.push(
-              `/lessons?class=${router.currentRoute.value.query.class}`
-            )
+            $router.back()
           "
           class="flex items-center gap-4 cursor-pointer max-w-fit"
         >

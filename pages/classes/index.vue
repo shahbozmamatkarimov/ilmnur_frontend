@@ -241,7 +241,6 @@ useUser.create.role = "leader_teacher";
 useClass.create.type = "leader_teacher";
 useUser.store.getall = [];
 const router = useRouter();
-useUser.getAll();
 
 if (isLoading.user.data.current_role == "leader_teacher") {
   classes.value = [{ value: 1, label: "1-sinf" }];
@@ -301,6 +300,10 @@ function getStudentRoute(e, id) {
   }
   router.push(`/classes/${id}`);
 }
+
+onBeforeMount(() => {
+  useUser.getAll();
+});
 </script>
 
 <style lang="scss"></style>

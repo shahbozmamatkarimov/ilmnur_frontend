@@ -1,6 +1,6 @@
 <template>
-  <div class="editor card mt-40 px-20">
-    <a-upload-dragger
+  <client-only class="editor card mt-40 px-20">
+    <!-- <a-upload-dragger
       v-model:fileList="useContent.create.video"
       name="file"
       :max-count="1"
@@ -14,7 +14,7 @@
         Support for a single or bulk upload. Strictly prohibit from uploading
         company data or other band files
       </p>
-    </a-upload-dragger>
+    </a-upload-dragger> -->
     <Editor id="editor" v-model="value" editorStyle="height: 320px">
       <!-- <template v-slot:toolbar>
         <span class="ql-formats">
@@ -27,8 +27,7 @@
     <button @click="send">Send</button>
     <!-- {{ value }} -->
     <!-- <div v-html="value"></div> -->
-  </div>
-  div
+  </client-only>
 </template>
 
 <script setup>
@@ -60,7 +59,7 @@ async function send() {
       console.log(image[t].src);
       t++;
     }
-    useContent.create.content = await value.value;
+    useContent.create.content = value.value;
     useContent.uploadContent();
   })();
 }

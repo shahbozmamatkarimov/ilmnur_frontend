@@ -60,7 +60,10 @@
           class="space-y-5 overflow-hidden overflow-y-auto md:max-h-[calc(100vh_-_255px)] max-h-[calc(100vh_-_210px)] pr-5 -mr-5"
         >
           <p class="font-medium !-mb-2">
-            O‘quvchilar: <span class="font-semibold">{{useClass.store.my_classes?.length}}  ta</span>
+            O‘quvchilar:
+            <span class="font-semibold"
+              >{{ useClass.store.my_classes?.length }} ta</span
+            >
           </p>
           <section class="overflow-x-auto">
             <table class="table-auto mt-5 w-full">
@@ -131,8 +134,6 @@ import { useLoadingStore, useClassStore } from "~/store";
 
 const isLoading = useLoadingStore();
 const useClass = useClassStore();
-useClass.store.class_name = isLoading.user.current_role_data.class[0];
-useClass.getTeacherClass();
 
 const store = reactive({
   is_open: false,
@@ -143,6 +144,10 @@ function getClassStudent(data) {
   store.is_open = true;
   useClass.getTeacherClass();
 }
+
+onBeforeMount(() => {
+  useClass.getTeacherClass();
+});
 </script>
 
 <style lang="scss" scoped></style>
