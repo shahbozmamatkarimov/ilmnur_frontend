@@ -56,6 +56,7 @@
             <td class="py-6 px-5">
               <div class="flex items-center h-full gap-2">
                 <UiAvatarEmpty class="max-h-[32px] max-w-[32px]" />
+                {{ i.role.user.id }}
                 {{ i.role.user.name }}
                 {{ i.role.user.surname }}
               </div>

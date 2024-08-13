@@ -14,20 +14,6 @@
           >Qo‘shish</UiButton
         >
       </div>
-      <div>
-        <a-select
-          v-model:value="useSubject.store.class"
-          class="md:hidden block mt-4 w-[140px] sr_12"
-          :options="
-            classes.map((pro, index) => ({ value: index + 1, label: pro }))
-          "
-          required
-        >
-          <template #suffixIcon>
-            <img class="ml-2" src="@/assets/svg/icon/arrow.svg" alt="" />
-          </template>
-        </a-select>
-      </div>
     </section>
     <section
       v-if="isLoading.isLoadingType('get')"
@@ -124,8 +110,8 @@
       </swiper>
     </section>
     <section class="full_flex h-full py-20 flex-col space-y-4" v-else>
-      <img class="h-20" src="@/assets/svg/icon/not_found.svg" alt="" />
-      <p>Hech qanday kurslar topilmadi</p>
+      <img draggable="false" class="h-20" src="@/assets/svg/icon/not_found.svg" alt="" />
+      <p>Hech qanday fan topilmadi</p>
     </section>
 
     <!-- create -->

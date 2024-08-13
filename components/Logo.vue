@@ -1,5 +1,5 @@
 <template>
-  <router-link to="/" @click="isLoading.store.routeToMain = true"><img src="/logo.svg" alt="" /></router-link>
+  <router-link draggable="false" to="/" @click="isLoading.store.routeToMain = true"><img draggable="false" src="/logo.svg" alt="" /></router-link>
 </template>
 
 <script setup>

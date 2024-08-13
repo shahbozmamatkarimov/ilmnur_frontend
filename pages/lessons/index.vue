@@ -111,7 +111,7 @@
     </section>
     <section class="full_flex h-full py-20 flex-col space-y-4" v-else>
       <img class="h-20" src="@/assets/svg/icon/not_found.svg" alt="" />
-      <p>Hech qanday kurslar topilmadi</p>
+      <p>Hech qanday dars topilmadi</p>
     </section>
   </main>
 </template>

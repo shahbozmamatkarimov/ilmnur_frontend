@@ -182,14 +182,15 @@ export const useCourseStore = defineStore("course", () => {
       });
   }
 
-  function addMember(type) {
+  function addMember(type, course_id) {
+    addmember.course_id = course_id;
     if (type == "jointogroup") {
       addmember.role_id = [isLoading.user.current_role_data.id];
     }
     if (!addmember.role_id?.length) {
       return;
     }
-    console.log(addmember.role_id)
+    console.log(addmember.role_id);
     // create.subject_id = router.currentRoute.value.params.subject_id;
     // if (modal.edit) {
     //   return updateCourse();

@@ -86,7 +86,7 @@
               </h1>
             </div>
           </div>
-          <router-link
+          <!-- <router-link
             @click="addAccount"
             to="/register"
             class="flex gap-3 items-center mb-5 h-6 cursor-pointer _c55"
@@ -97,7 +97,7 @@
             <div class="block">
               <h1 class="font-medium">Hisob qo‘shish</h1>
             </div>
-          </router-link>
+          </router-link> -->
           <hr class="border_ced !border-0 !border-b -mx-4 px-4" />
         </a-collapse-panel>
       </a-collapse>

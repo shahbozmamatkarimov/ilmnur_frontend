@@ -18,14 +18,6 @@ export const sidebar = [
   },
   {
     id: 1,
-    name: "Fanlar",
-    url: "/subjects",
-    svg: _lesson,
-    // svgActive: dashboardActive,
-    role: ["admin"],
-  },
-  {
-    id: 1,
     name: "To'lovlar",
     url: "/payments",
     svg: _lesson,
@@ -81,14 +73,14 @@ export const sidebar = [
   //   // svgActive: dashboardActive,
   //   role: ["leader_teacher", "director"],
   // },
-  {
-    id: 1,
-    name: "Chat",
-    url: "/chat",
-    svg: _message,
-    // svgActive: dashboardActive,
-    role: [],
-  },
+  // {
+  //   id: 1,
+  //   name: "Chat",
+  //   url: "/chat",
+  //   svg: _message,
+  //   // svgActive: dashboardActive,
+  //   role: [],
+  // },
   {
     id: 1,
     name: "Yangiliklar",

@@ -119,7 +119,7 @@
                             </h1>
                           </div>
                         </div>
-                        <router-link
+                        <!-- <router-link
                           v-if="isLoading.user.data.current_role != 'student'"
                           @click="
                             useUser.create.phone =
@@ -137,7 +137,7 @@
                           <div class="block">
                             <h1 class="font-medium">Hisob qo‘shish</h1>
                           </div>
-                        </router-link>
+                        </router-link> -->
                         <div class="block">
                           <button
                             @click="useUser.store.deleteModal = true"
