@@ -113,14 +113,20 @@ function handleCredentialResponse(response) {
 async function verifyGoogleCredential(credential) {
   // Make an API request to your backend to verify the credential
   try {
-    const { data } = await useFetch("/api/auth/google", {
+    const { error, data } = await useFetch("/api/auth/google", {
       method: "POST",
       body: {
         credential,
       },
     });
 
-    console.log("Backend Response:", data);
+    console.log("Backend Response:", data.value);
+    console.log("Backend Response:", error.value);
+    if (error.value) {
+      console.error("Error:", error.value);
+    } else {
+      console.log("Backend Response:", data.value);
+    }
     // Handle the response, e.g., save the user session or token
   } catch (error) {
     console.error("Error verifying Google credential:", error);
