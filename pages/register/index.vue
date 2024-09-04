@@ -63,6 +63,7 @@ import { useAuthStore, useLoadingStore } from "@/store";
 const useAuth = useAuthStore();
 const isLoading = useLoadingStore();
 isLoading.store.verification = true;
+const runtime = useRuntimeConfig();
 
 useAuth.register.role = "student";
 
@@ -107,8 +108,7 @@ function handleCredentialResponse(response) {
 
 onMounted(() => {
   google.accounts.id.initialize({
-    client_id:
-      "1052636609273-5b35pkatqdgnvm2pf364efpmrjo0om1m.apps.googleusercontent.com",
+    client_id: runtime.public.client_id,
     callback: handleCredentialResponse, //method to run after user clicks the Google sign in button
     context: "signin",
   });

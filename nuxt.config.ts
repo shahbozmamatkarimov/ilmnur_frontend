@@ -161,6 +161,7 @@ export default defineNuxtConfig({
     public: {
       baseURL: process.env.BASE_URL,
       realtimeURL: process.env.REALTIME_URL,
+      client_id: process.env.CLIENT_ID,
     },
   },
   // build: {
