@@ -1,0 +1,1 @@
+import{s as e}from"./D5tiAz_E.js";import{ao as r}from"./B7WI5WXn.js";import"./-cNTWuXj.js";var n={},o={name:"BaseInputIcon",extends:e,style:n,provide:function(){return{$parentInstance:this}}},s={name:"InputIcon",extends:o};function a(t,p,i,c,d,u){return r(t.$slots,"default")}s.render=a;export{s as default};

@@ -103,7 +103,28 @@ function onFocusEvent(index) {
 
 function handleCredentialResponse(response) {
   console.log(response);
-  // handle API calls same as above
+  const credential = response.credential;
+  console.log("Google Credential:", credential);
+
+  // Send the credential to your backend for verification
+  verifyGoogleCredential(credential);
+}
+
+async function verifyGoogleCredential(credential) {
+  // Make an API request to your backend to verify the credential
+  try {
+    const { data } = await useFetch("/api/auth/google", {
+      method: "POST",
+      body: {
+        credential,
+      },
+    });
+
+    console.log("Backend Response:", data);
+    // Handle the response, e.g., save the user session or token
+  } catch (error) {
+    console.error("Error verifying Google credential:", error);
+  }
 }
 
 onMounted(() => {
