@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { ApiRequest } from "~/helpers";
 import { useLoadingStore, useContentStore } from "@/store";
+import { useNotification } from "@/composables";
 import axios from "axios";
 
 export const useCourseStore = defineStore("course", () => {
@@ -10,6 +11,7 @@ export const useCourseStore = defineStore("course", () => {
   const isLoading = useLoadingStore();
   const useContent = useContentStore();
   const router = useRouter();
+  const { showMessage } = useNotification();
   const { start, finish } = useLoadingIndicator();
   console.log(start);
 
@@ -22,6 +24,8 @@ export const useCourseStore = defineStore("course", () => {
     membership: [],
     class: 1,
     createModal: false,
+    user_dates: [],
+    addMember: false,
   });
 
   const create = reactive({
@@ -32,6 +36,7 @@ export const useCourseStore = defineStore("course", () => {
     subject_id: "",
     published: false,
     type: "public",
+    price_type: "monthly",
     file: {
       file: "",
       url: "",
@@ -47,6 +52,7 @@ export const useCourseStore = defineStore("course", () => {
 
   const addmember = reactive({
     course_id: "",
+    dates: [],
     role_id: [],
   });
 
@@ -81,14 +87,6 @@ export const useCourseStore = defineStore("course", () => {
   }
 
   async function getCourses() {
-    let obj = {
-      timeoutId: setTimeout(() => {
-        console.log("Hey");
-      }, 3100),
-    };
-    delete obj.timeoutId;
-    obj = null;
-
     start();
     store.courses = [];
     let subject = router.currentRoute.value.params.subject_id;
@@ -183,9 +181,11 @@ export const useCourseStore = defineStore("course", () => {
   }
 
   function addMember(type, course_id) {
-    addmember.course_id = course_id;
     if (type == "jointogroup") {
       addmember.role_id = [isLoading.user.current_role_data.id];
+      addmember.course_id = course_id;
+    }else {
+      addmember.course_id = store.course_id;      
     }
     if (!addmember.role_id?.length) {
       return;
@@ -197,7 +197,6 @@ export const useCourseStore = defineStore("course", () => {
     // }
     const token = localStorage.getItem("token");
     isLoading.addLoading("addMember");
-    console.log(addmember);
     axios
       .post(baseUrl + `coursemember/create`, addmember, {
         headers: {
@@ -206,7 +205,7 @@ export const useCourseStore = defineStore("course", () => {
       })
       .then((res) => {
         console.log(res);
-        modal.create = false;
+        store.addMember = false;
         if (type == "jointogroup") {
           const current_route = router.currentRoute.value;
           const subject_id = current_route.params.subject_id;
@@ -214,6 +213,7 @@ export const useCourseStore = defineStore("course", () => {
             `/subjects/${subject_id}/courses/${store.course_id}/lessons`
           );
         }
+        showMessage("Add member", "Member added successfully")
         getCourses();
         isLoading.removeLoading("addMember");
       })
@@ -221,6 +221,7 @@ export const useCourseStore = defineStore("course", () => {
         console.log(err);
         // openNotification(err?.response?.data?.message);
         isLoading.removeLoading("addMember");
+        showMessage("Add member", "Something went wrong")
       });
   }
 

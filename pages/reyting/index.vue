@@ -19,10 +19,10 @@
         class="flex gap-2 md:mt-[40px] mt-1 text-[#555555] pt-5 overflow-hidden overflow-x-auto tabs"
       >
         <button
-          @click="useReyting.store.subject_id = 0"
+          @click="useReyting.store.subject = 0"
           class="bg-[#F5F5F5] rounded-full px-3 h-10"
           :class="
-            useReyting.store.subject_id == 0
+            useReyting.store.subject == 0
               ? 'bg_orange white'
               : 'bg-[#F5F5F5]'
           "
@@ -30,11 +30,11 @@
           Barchasi
         </button>
         <button
-          @click="useReyting.store.subject_id = i.id"
+          @click="useReyting.store.subject = i.id"
           v-for="i in useSubject.store.subjects"
           class="rounded-full px-3 h-10"
           :class="
-            useReyting.store.subject_id == i.id
+            useReyting.store.subject == i.id
               ? 'bg_orange white'
               : 'bg-[#F5F5F5]'
           "
@@ -45,47 +45,18 @@
       <ul
         class="flex overflow-hidden overflow-x-auto tabs gap-2 mt-5 mb-[30px]"
       >
-        <li class="reyting_select rounded-md">
-          <div class="flex items-center gap-1">
-            <a-select
-              @change="handleChangeReyting"
-              v-model:value="useReyting.store.class_data[0]"
-              class="min-w-[60px] sr_12"
-              :options="sinf.map((pro) => ({ value: pro }))"
-              placeholder="Sinf nomi"
-              required
-            >
-              <template #suffixIcon>
-                <img src="@/assets/svg/reyting/select_arrow.svg" alt="" />
-              </template>
-            </a-select>
-            <p class="h-[1px] w-2 bg-[#CCCCCC]"></p>
-            <a-select
-              @change="handleChangeReyting"
-              v-model:value="useReyting.store.class_data[1]"
-              class="min-w-[60px] sr_12"
-              :options="sinf_type.map((pro) => ({ value: pro }))"
-              placeholder="Sinf raqami"
-              required
-            >
-              <template #suffixIcon>
-                <img src="@/assets/svg/reyting/select_arrow.svg" alt="" />
-              </template>
-            </a-select>
-          </div>
-        </li>
-        <li class="reyting_select rounded-md">
+        <li class="reyting_select rounded-md w-full">
           <a-select
             @change="handleRegion"
-            class="!placeholder-[#555555]"
-            v-model:value="useReyting.store.filter.region"
+            class="!placeholder-[#555555] w-full"
+            v-model:value="useReyting.store.course_id"
             :options="
-              regions.map((pro) => ({
-                value: pro.id,
-                label: pro.name_uz,
+              useReyting.store.courses.map((pro, index) => ({
+                value: index,
+                label: pro.courses.name,
               }))
             "
-            placeholder="Barcha viloyatlar"
+            placeholder="Kursingizni tanlang"
             required
           >
             <template #suffixIcon>
@@ -93,37 +64,10 @@
             </template>
           </a-select>
         </li>
-        <li class="reyting_select rounded-md">
-          <a-select
-            class="!placeholder-[#555555]"
-            :options="store.districts.map((pro) => ({ value: pro.name_uz }))"
-            @change="handleChangeReyting"
-            v-model:value="useReyting.store.filter.district"
-            placeholder="Barcha tumanlar"
-            required
-          >
-            <template #suffixIcon>
-              <img src="@/assets/svg/reyting/select_arrow.svg" alt="" />
-            </template>
-          </a-select>
-        </li>
-        <li class="reyting_select rounded-md">
-          <a-select
-            class="!placeholder-[#555555]"
-            @change="handleChangeReyting"
-            v-model:value="useReyting.store.filter.school_number"
-            :options="school_number.map((pro) => ({ value: pro }))"
-            placeholder="Barcha maktablar"
-            required
-          >
-            <template #suffixIcon>
-              <img src="@/assets/svg/reyting/select_arrow.svg" alt="" />
-            </template>
-          </a-select>
-        </li>
+        <!--         
         <li @click="clearFilter">
           <button class="bg-[#f5f5f5] h-10 rounded-md px-4">Tozalash</button>
-        </li>
+        </li> -->
       </ul>
       <div class="bg-white">
         <a-tabs class="-mb-4 max-w-fit" v-model:activeKey="store.activeTab">
@@ -147,10 +91,13 @@
         <swiper-slide :id="index" v-for="(i, index) in ['student', 'teacher']">
           <section class="pb-20">
             <table
-            v-if="
+              v-if="
                 !isLoading.isLoadingType('getStudentReyting') ||
                 !isLoading.isLoadingType('getTeacherReyting')
-              " id="table" class="draggable-table mt-6 w-full text-start">
+              "
+              id="table"
+              class="draggable-table mt-6 w-full text-start"
+            >
               <thead>
                 <tr>
                   <th></th>
@@ -246,21 +193,11 @@ const useReyting = useReytingStore();
 const useSubject = useSubjectStore();
 const isLoading = useLoadingStore();
 
-const classes = ref([]);
-
 const store = reactive({
   activeTab: 1,
   mouse_wheel: 0,
-  districts: district,
 });
 
-const sinf = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
-const sinf_type = ["A", "B", "C", "D", "E", "F", "G", "H", "I"];
-let school_number = [];
-
-for (let i = 1; i <= 200; i++) {
-  school_number.push(i);
-}
 function changeSlide() {
   setTimeout(() => {
     store.activeTab = +document.querySelector(".swiper-slide-visible")?.id + 1;
@@ -298,7 +235,7 @@ function mouseSlider(e) {
 }
 
 function handleChangeReyting() {
-  useReyting.geReyting();
+  useReyting.getCourses();
 }
 
 function clearFilter() {
@@ -325,14 +262,14 @@ watch(
 );
 
 watch(
-  () => useReyting.store.subject_id,
+  () => useReyting.store.subject,
   () => {
-    useReyting.geReyting();
+    useReyting.getCourses();
   }
 );
 
 onBeforeMount(() => {
-  useReyting.geReyting();
+  useReyting.getCourses();
   useSubject.getSubjects();
 });
 </script>

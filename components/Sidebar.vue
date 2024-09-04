@@ -105,7 +105,7 @@
         :class="store.account_collapse[0] ? 'mt-4' : ''"
         class="duration-500"
       >
-        <router-link :to="i.url" v-for="i in sidebar" :key="i.id">
+      <router-link :to="i.url" v-for="i in sidebar" :key="i.id">
           <div
             v-if="
               i.role?.includes(isLoading.user.data?.current_role) ||

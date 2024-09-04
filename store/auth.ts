@@ -60,19 +60,19 @@ export const useAuthStore = defineStore("auth", () => {
         console.log(res, "user data");
         if (res.data.statusCode == 200) {
           // isLoading.middleware.passwordChecking = false;
-          isLoading.user.data = res.data.data;
+          isLoading.user.data = res.data?.data;
           isLoading.store.socket = io("http://localhost:4000", {
             reconnectionDelayMax: 10000000, // Maximum delay between reconnection attempts (milliseconds)
             reconnectionAttempts: 5,
             query: {
-              id: isLoading.user.data.id,
+              id: isLoading.user?.data.id,
             },
           });
           isLoading.user.current_role_step = 0;
           isLoading.middleware.loading = false;
-          for (let i of isLoading.user.data.role) {
+          for (let i of isLoading.user?.data.role) {
             isLoading.user.current_role_step += 1;
-            if (i.role == isLoading.user.data.current_role) {
+            if (i.role == isLoading.user?.data.current_role) {
               isLoading.user.current_role_data = i;
               break;
             }
@@ -98,7 +98,7 @@ export const useAuthStore = defineStore("auth", () => {
       .catch((err) => {
         isLoading.middleware.loading = false;
         console.log(err);
-        if (err.response.data.message == "User not found!") {
+        if (err.response?.data.message == "User not found!") {
           localStorage.removeItem("token");
         }
         const isRoute = [

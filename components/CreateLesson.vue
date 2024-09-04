@@ -11,7 +11,14 @@
         class="flex items-center flex-col min-h-[calc(100vh_-_250.5px)] pb-10 max-h-[calc(100vh_-_250.5px)] overflow-hidden overflow-y-auto px-5"
       >
         <div class="w-full" v-if="useContent.store.video.url">
+          <iframe
+            v-if="useContent.store.video.url?.includes('youtu')"
+            :src="useContent.store.video.url"
+            class="xl:h-[312px] md:h-[270px] sm:h-[250px] h-[172px] w-full sm:rounded-lg max-h-[312px] rounded-lg relative overflow-hidden bg-black"
+            allowfullscreen
+          ></iframe>
           <video
+            v-else
             class="xl:h-[312px] md:h-[270px] sm:h-[250px] h-[172px] w-full sm:rounded-lg max-h-[312px] rounded-lg relative overflow-hidden bg-black"
             controls
           >
@@ -436,12 +443,24 @@ function playVideo() {
   store.is_playing = true;
 }
 
-function setVideoType(type) {
+function setVideoType(type: string) {
   store.videoType = type;
   store.videoUploadStep = 2;
 }
 
+function convertToEmbedUrl(youtubeUrl: string) {
+  // Extract the video ID from the YouTube URL
+  const videoId =
+    youtubeUrl.split("v=")[1]?.split("&")[0] || youtubeUrl.split("/").pop();
+
+  // Return the embeddable URL
+  return `https://www.youtube.com/embed/${videoId}`;
+}
+
 function uploadData() {
+  if (store.videoType == "youtube") {
+    useContent.store.video.url = convertToEmbedUrl(useContent.file.file);
+  }
   if (useContent.create.content == undefined) {
     useContent.create.content = ``;
   }

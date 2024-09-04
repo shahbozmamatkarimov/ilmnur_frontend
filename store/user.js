@@ -1,13 +1,17 @@
 import { defineStore } from "pinia";
-import { useLoadingStore, useAuthStore } from "@/store";
+import { useLoadingStore, useAuthStore, useCourseStore } from "@/store";
 import axios from "axios";
 import { useNotification } from "@/composables";
 import { roles } from "@/constants";
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc'; // Import the UTC plugin
+import localeData from 'dayjs/plugin/localeData';
 export const useUserStore = defineStore("User", () => {
   const { showMessage } = useNotification();
   const runtime = useRuntimeConfig();
   const baseUrl = runtime.public.baseURL;
   const useAuth = useAuthStore();
+  const useCourse = useCourseStore();
   const isLoading = useLoadingStore();
   const router = useRouter();
 
@@ -257,6 +261,14 @@ export const useUserStore = defineStore("User", () => {
       .then((res) => {
         console.log(res);
         store.search_users = res.data.data.records;
+        let date
+        useCourse.store.user_dates = [];
+        for (let i of store.search_users) {
+          date = new Date();
+          const formattedDate = formatDateToYYYYMMDD(date);
+          useCourse.store.user_dates.push(dayjs(formattedDate, "YYYY-MM-DD"));
+        }
+        console.log(useCourse.store.user_dates)
         isLoading.removeLoading("getAllUsers");
       })
       .catch((err) => {
@@ -394,6 +406,14 @@ export const useUserStore = defineStore("User", () => {
         showMessage("Xato", "Nimadir xato ketdi");
         isLoading.removeLoading("deleteUser");
       });
+  }
+
+  function formatDateToYYYYMMDD(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const day = String(date.getDate()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
   }
 
   return {

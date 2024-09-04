@@ -10,7 +10,8 @@ import { useVideoLessonStore } from "./video_lesson";
 import { useTestStore } from "./test";
 import { useReytingStore } from "./reyting";
 import { useSettingsStore } from "./settings";
-import { useClassStore } from "./class";
+import { useGroupStore } from "./group";
+import { useGroupuserStore } from "./group_user";
 import { useProfileStore } from "./profile";
 import { useNewsStore } from "./news";
 import { usePaymentStore } from "./payment";
@@ -27,9 +28,10 @@ export {
   useTestStore,
   useReytingStore,
   useSettingsStore,
-  useClassStore,
+  useGroupStore,
   useProfileStore,
   useNewsStore,
   useCourseStore,
   usePaymentStore,
+  useGroupuserStore,
 };

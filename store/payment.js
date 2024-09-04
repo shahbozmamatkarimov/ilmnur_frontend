@@ -9,6 +9,7 @@ export const usePaymentStore = defineStore("payment", () => {
   const router = useRouter();
   const store = reactive({
     getall: [],
+    courses: [],
   });
 
   function getAll() {
@@ -21,8 +22,19 @@ export const usePaymentStore = defineStore("payment", () => {
       .catch((_) => {});
   }
 
+  function getByRoleId() {
+    axios
+      .get(baseUrl + `coursemember/getByRoleId/${isLoading.user.current_role_data.id}`)
+      .then((res) => {
+        console.log(res, 'pay');
+        store.courses = res.data
+      })
+      .catch((_) => {});
+  }
+
   return {
     store,
     getAll,
+    getByRoleId,
   };
 });

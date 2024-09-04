@@ -9,57 +9,59 @@ export const useReytingStore = defineStore("reyting", () => {
   const router = useRouter();
 
   const store = reactive({
-    reyting: {
-      teacher: [],
-      student: [],
-    },
-    subject_id: 0,
-    class_data: [],
-    filter: {
-      region: null,
-      district: null,
-      school_number: null,
-    },
+    subject: "math",
+    course_id: null,
+    reyting: [],
+    courses: [],
   });
 
-  function geReyting() {
+  function getReyting() {
     isLoading.addLoading("getStudentReyting");
-    isLoading.addLoading("getTeacherReyting")
     axios
-      .post(baseUrl + `role/reyting/student`, {
-        subject_id: store.subject_id,
-        class: store.class_data,
-        ...store.filter,
+      .post(baseUrl + `getCourseReyting/${store.course_id}/${store.subject}`, {
+        subject: store.subject,
+        course_id: store.course_id,
       })
       .then((res) => {
         console.log(res);
-        store.reyting.student = res.data.data;
+        store.reyting = res.data.data;
         isLoading.removeLoading("getStudentReyting");
       })
       .catch((err) => {
         console.log(err);
         isLoading.removeLoading("getStudentReyting");
       });
-
-    axios
-      .post(baseUrl + `role/teacher_reyting/${store.subject_id}`, {
-        subject_id: store.subject_id,
-        class: store.class_data,
-        ...store.filter,
-      })
-      .then((res) => {
-        console.log(res);
-        store.reyting.teacher = res.data.data;
-        const user_id = router.currentRoute.value.query.id;
-        document.getElementById(user_id)?.scrollIntoView();
-        isLoading.removeLoading("getTeacherReyting");
-      })
-      .catch((err) => {
-        console.log(err);
-        isLoading.removeLoading("getTeacherReyting");
-      });
-    // }
   }
 
-  return { store, geReyting };
+  function getCourses() {
+    isLoading.addLoading("getCourses");
+    const token = localStorage.getItem("token");
+    axios
+    .get(baseUrl + `course/getAll/${store.subject}`, {
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    })
+    .then((res) => {
+      console.log(res);
+      if (res.data.statusCode == 200) {
+        console.log(res, "==d=skdls");
+        // store.courses = res.data.data;
+        store.courses = res.data.membership;
+        // store.user_step = res.data.step?.data.pop();
+      } else {
+        store.courses = [];
+        // openNotification(res.data.message);
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+      finish();
+      store.courses = [];
+      // openNotification(err?.response?.data?.message);
+    });
+
+  }
+
+  return { store, getReyting, getCourses };
 });

@@ -1,9 +1,8 @@
 import { defineStore } from "pinia";
 import { useLoadingStore } from "@/store";
 import axios from "axios";
-import { notification } from "ant-design-vue";
 
-export const useClassStore = defineStore("Class", () => {
+export const useGroupStore = defineStore("Group", () => {
   const runtime = useRuntimeConfig();
   const baseUrl = runtime.public.baseURL;
   const isLoading = useLoadingStore();
@@ -11,16 +10,14 @@ export const useClassStore = defineStore("Class", () => {
 
   const store = reactive({
     getall: [],
+    getById: {},
+    getUsers: [],
     my_classes: [],
     class_name: [],
   });
 
   const create = reactive({
-    class_number: "",
     name: "",
-    teacher_id: "",
-    creator_id: "",
-    type: "",
   });
 
   const openNotification = (res) => {
@@ -35,7 +32,7 @@ export const useClassStore = defineStore("Class", () => {
   function createData() {
     create.creator_id = isLoading.user.current_role_data.id;
     axios
-      .post(baseUrl + "class/create", create)
+      .post(baseUrl + "group/create", create)
       .then((res) => {
         console.log(res);
         if (res.data.statusCode == 200) {
@@ -50,16 +47,66 @@ export const useClassStore = defineStore("Class", () => {
       });
   }
 
-  function updateStatus(id) {
+  function getById() {
+    isLoading.addLoading("getById");
+    const id = router.currentRoute.value.params.class;
     axios
-      .put(baseUrl + "class/status/" + id)
+      .get(baseUrl + `group/getById/${id}`)
+      .then((res) => {
+        console.log(res);
+        store.getById = res.data.data;
+        isLoading.removeLoading("getById");
+      })
+      .catch((err) => {
+        console.log(err);
+        openNotification(err?.response?.data?.message);
+        isLoading.removeLoading("getById");
+      });
+  }
+
+  function getUsers(id) {
+    isLoading.addLoading("getUsers");
+    axios
+      .get(baseUrl + `group/getUsers/${id}`)
+      .then((res) => {
+        console.log(res);
+        store.getUsers = res.data.data;
+        isLoading.removeLoading("getUsers");
+      })
+      .catch((err) => {
+        console.log(err);
+        openNotification(err?.response?.data?.message);
+        isLoading.removeLoading("getUsers");
+      });
+  }
+
+  function updateCode() {
+    isLoading.addLoading("generate");
+    const id = router.currentRoute.value.params.class;
+    axios
+      .put(baseUrl + "group/generate/" + id)
       .then((res) => {
         console.log(res);
         if (res.data.statusCode == 200) {
+          store.getById = res.data.data;
           openNotification(res.data.message);
         } else {
           openNotification(res.data.message);
         }
+        isLoading.removeLoading("generate");
+      })
+      .catch((err) => {
+        console.log(err);
+        openNotification(err?.response?.data?.message);
+        isLoading.removeLoading("generate");
+      });
+  }
+
+  function addGroupstep(id) {
+    axios
+      .put(baseUrl + "group/addstep/" + id)
+      .then((res) => {
+        console.log(res);
       })
       .catch((err) => {
         console.log(err);
@@ -69,12 +116,13 @@ export const useClassStore = defineStore("Class", () => {
 
   function getAll() {
     axios
-      .get(baseUrl + `class`)
+      .get(baseUrl + `group`)
       .then((res) => {
         console.log(res);
         store.getall = res.data.data;
       })
       .catch((err) => {
+        console.log(err);
         openNotification(err?.response?.data?.message);
       });
   }
@@ -84,7 +132,7 @@ export const useClassStore = defineStore("Class", () => {
     axios
       .get(
         baseUrl +
-          `class/leaderteacherclass/${isLoading.user.current_role_data.id}`,
+          `group/leaderteachergroup/${isLoading.user.current_role_data.id}`,
         {
           headers: {
             Authorization: "Bearer " + token,
@@ -140,8 +188,12 @@ export const useClassStore = defineStore("Class", () => {
     create,
     createData,
     getAll,
-    updateStatus,
+    getById,
+    // updateStatus,
     getLeaderTeacherClass,
     getTeacherClass,
+    addGroupstep,
+    updateCode,
+    getUsers,
   };
 });

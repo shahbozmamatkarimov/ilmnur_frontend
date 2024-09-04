@@ -64,7 +64,13 @@ export default defineNuxtRouteMiddleware(async (to: any, from) => {
           // }
         }
       } else if (!isRoute) {
-        console.log(!isRoute);
+        if (
+          to.name ==
+            "test" &&
+          to.query.g
+        ) {
+          return;
+        }
         isLoading.middleware.loading = false;
         console.log("object");
         return navigateTo("/");

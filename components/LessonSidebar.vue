@@ -85,8 +85,7 @@ const router = useRouter();
 function changeLesson(data, index, is_route) {
   if (is_route || index == 0) {
     const path = router.currentRoute.value.path.split("/");
-    let url = "/" + path[1] + "/" + path[2];
-    url += "/" + data.id + "?class=" + router.currentRoute.value.query.class;
+    let url = "/" + path[1] + "/" + path[2] + "/" + path[3] + "/" + path[4] + "/" + path[5] + "/" + data.id;
     router.push(url);
   }
 }

@@ -192,19 +192,7 @@ function nextPage(lesson_id, type) {
   if (type == "create_test") {
     url = "/" + type + "?lesson_id=" + lesson_id;
   } else {
-    url =
-      "/" +
-      path[1] +
-      "/" +
-      path[2] +
-      "/" +
-      path[3] +
-      "/" +
-      path[4] +
-      "/" +
-      path[5]+ '/'+
-      lesson_id + '/' + lesson_id;
-    url += "?class=" + router.currentRoute.value.query.class;
+    url = `/test?t=${lesson_id}`
   }
   router.push(url);
 }

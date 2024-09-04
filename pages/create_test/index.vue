@@ -25,14 +25,26 @@
               </div>
             </template>
           </a-select>
-          <div>
-            <label
-              for="import_file"
-              class="full_flex gap-2 bg-white p-1.5 rounded-md border_ced cursor-pointer"
+          <div class="flex gap-2">
+            <div>
+              <label
+                for="import_file"
+                class="full_flex gap-2 bg-white p-1.5 rounded-md border_ced cursor-pointer"
+              >
+                <img class="h-7 w-7" src="@/assets/svg/image/word.png" alt="" />
+                <p>WORD</p>
+              </label>
+            </div>
+            <button
+              @click="store.settings = true"
+              class="bg-white rounded-md p-1.5 w-10"
             >
-              <img class="h-7 w-7" src="@/assets/svg/image/word.png" alt="" />
-              <p>WORD</p>
-            </label>
+              <img
+                class="mx-auto"
+                src="@/assets/svg/subjects/settings.svg"
+                alt=""
+              />
+            </button>
           </div>
         </div>
         <div class="flex gap-[10px] my-6">
@@ -340,6 +352,87 @@
       type="file"
       id="import_file"
     />
+
+    <!-- create -->
+    <a-modal class="max-w-[440px]" v-model:open="store.settings" centered>
+      <div class="flex justify-between items-center w-full">
+        <h1 class="font-semibold text-2xl">Sozlamalalar</h1>
+      </div>
+      <div class="mt-4 space-y-4">
+        <div class="space-y-2">
+          <label for="name">Boshlanish vaqti</label>
+          <div class="flex gap-2">
+            <a-date-picker
+              class="w-full"
+              v-model:value="useTest.test_settings.start_date"
+              placeholder="0000-00-00"
+            />
+            <a-time-picker
+              v-model:value="useTest.test_settings.start_date"
+              format="HH:mm"
+              placeholder="00:00"
+            />
+          </div>
+        </div>
+        <div class="space-y-2">
+          <label for="name">Tugash vaqti</label>
+          <div class="flex gap-2">
+            <a-date-picker
+              class="w-full"
+              v-model:value="useTest.test_settings.end_date"
+              placeholder="0000-00-00"
+            />
+            <a-time-picker
+              v-model:value="useTest.test_settings.end_date"
+              format="HH:mm"
+              placeholder="00:00"
+            />
+          </div>
+        </div>
+        <div class="space-y-2">
+          <label for="name">Test muddati</label>
+          {{ useTest.test_settings.period }}
+          <div>
+            <a-time-picker
+              @change="
+                (val) => {
+                  const hours = val.split(':');
+                  const hour = +hours[0] * 60;
+                  const minute = +hours[1];
+                  useTest.test_settings.period = minute + hour;
+                }
+              "
+              format="HH:mm"
+              value-format="HH:mm"
+              placeholder="00:00"
+            />
+          </div>
+        </div>
+        <div class="space-y-2">
+          <h2>Saralash</h2>
+          <div class="grid grid-cols-3">
+            <div class="space-y-2">
+              <label for="sortnum">Saralash bosqichi</label>
+              <input
+                v-model="useTest.test_settings.sort_level"
+                id="sortnum"
+                type="number"
+                class="w-16"
+              />
+            </div>
+            <div class="space-y-2">
+              <label for="sortnum">Testlar soni</label>
+              <input
+                v-model="useTest.test_settings.test_count"
+                id="sortnum"
+                type="number"
+                class="w-16"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </a-modal>
   </main>
 </template>
 
@@ -375,6 +468,7 @@ const store = reactive({
   not_completed: [],
   is_completed: false,
   convertedContent: "",
+  settings: false,
 });
 const sinf = [
   {
@@ -452,7 +546,7 @@ function htmlTableToArray(htmlTable) {
     for (let j = 2; j < result[i]?.length; j++) {
       useTest.test[i + 1].variant[j - 1] = result[i][j];
     }
-    console.log(useTest.test[i + 1].variant)
+    console.log(useTest.test[i + 1].variant);
   }
   // return result;
   // const regex = /<p>(.*?)<\/p>/g;

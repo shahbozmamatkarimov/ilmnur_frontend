@@ -5,10 +5,52 @@
     <nav class="border-b border-[#EDEDED]">
       <h1 class="text-xl font-semibold pb-3">Sozlamalar</h1>
     </nav>
-    <section class="space-y-10 whitespace-nowrap mt-5">
+    <h1 class="font-semibold mt-5">Kurslaringiz</h1>
+    <section class="space-y-10 whitespace-nowrap mt-2">
+      <div
+        class="flex items-center gap-6"
+        v-for="i in usePayment.store.courses"
+      >
+        <div class="flex items-center gap-2 w-[30%]">
+          <div
+            class="bg-gray-300 w-9 h-9 rounded-md min-w-[36px] overflow-hidden"
+          >
+            <img
+              v-if="i.courses.image"
+              class="h-9 w-9 object-cover"
+              :src="i.courses.image"
+              alt=""
+            />
+          </div>
+          <ul class="w-[80%] text-sm">
+            <li class="truncate">
+              {{ i.courses.name }}
+            </li>
+            <li class="truncate">{{ i.courses.type }}</li>
+          </ul>
+        </div>
+        <ul class="md:w-[100%]">
+          <li>
+            <!-- 30/22/2024 -->
+            {{ i.date }}
+            <p class="inline-block ml-4 px-1 rounded-md bg-gray-300">
+              {{ getLastDates(i.date) }}
+            </p>
+            <button
+              class="inline-block px-3 py-1 ml-4 bg_orange white rounded-md"
+            >
+              Kursni ko'rish
+            </button>
+          </li>
+        </ul>
+      </div>
       <div class="flex items-center gap-16">
         <p>Profil rasmi</p>
-        <label v-if="!useSettings.user.image" for="upload_image">
+        <label
+          v-if="!useSettings.user.image"
+          for="upload_image"
+          class="md:w-[70%] md:ml-auto"
+        >
           <!-- <img src="@/assets/svg/settings/profile.svg" alt="" /> -->
           <UiAvatarEmpty />
         </label>
@@ -40,202 +82,6 @@
             type="text"
             placeholder="Enter your full name"
           />
-          <div
-            v-if="isLoading.user.data.current_role != 'admin'"
-            class="space-y-[10px]"
-          >
-            <h1>Viloyat</h1>
-            <a-select
-              v-model:value="useSettings.user.region"
-              @change="handleRegion"
-              class="w-full"
-              show-search
-              :options="
-                regions.map((pro) => ({
-                  value: pro.id,
-                  label: pro.name_uz,
-                }))
-              "
-              placeholder="Viloyatingizni tanlang"
-              required
-            >
-              <template #suffixIcon>
-                <p class="h-4 w-[1px]"></p>
-                <img src="@/assets/svg/icon/select_arrow6c.svg" alt="" />
-              </template>
-            </a-select>
-          </div>
-          <div
-            v-if="isLoading.user.data.current_role != 'admin'"
-            class="space-y-[10px]"
-          >
-            <h1>Tuman</h1>
-            <a-select
-            @change="handleChange"
-              v-model:value="useSettings.user.district"
-              class="w-full"
-              show-search
-              :options="store.districts.map((pro) => ({ value: pro.name_uz }))"
-              placeholder="Tumaningizni tanlang"
-              required
-            >
-              <template #suffixIcon>
-                <p class="h-4 w-[1px]"></p>
-                <img src="@/assets/svg/icon/select_arrow6c.svg" alt="" />
-              </template>
-            </a-select>
-          </div>
-          <div
-            v-if="
-              isLoading.user.data.current_role != 'admin' &&
-              isLoading.user.data.current_role != 'parents'
-            "
-            class="space-y-[10px]"
-          >
-            <h1>Maktab</h1>
-            <a-select
-            @change="handleChange"
-              v-model:value="useSettings.user.school_number"
-              class="w-full"
-              :options="sinf.map((pro) => ({ value: pro }))"
-              placeholder="Maktabingizni tanlang"
-              required
-            >
-              <template #suffixIcon>
-                <p class="h-4 w-[1px]"></p>
-                <img src="@/assets/svg/icon/select_arrow6c.svg" alt="" />
-              </template>
-            </a-select>
-          </div>
-          <div
-            v-if="
-              isLoading.user.data.current_role == 'teacher' ||
-              isLoading.user.data.current_role == 'methodological'
-            "
-            class="space-y-2"
-          >
-            <label for="subject">O'qituv fani</label>
-            <div
-              v-for="i in useUser.store.subject_step"
-              class="flex items-center gap-2"
-            >
-              <a-select
-                v-model:value="useSettings.user.subjects[i - 1]"
-                filterable
-                @change="checkUserSubjects(i)"
-                class="w-full sr_12"
-                required
-              >
-                <template #suffixIcon>
-                  <p class="h-4 w-[1px]"></p>
-                  <img src="@/assets/svg/icon/select_arrow6c.svg" alt="" />
-                </template>
-                <a-select-option
-                  v-for="subject in provinceData"
-                  :value="subject"
-                  >{{ subject }}</a-select-option
-                >
-              </a-select>
-              <p
-                @click="useUser.store.subject_step += 1"
-                class="full_flex min-w-[50px] h-[50px] rounded-full border border-[#CCCCCC] cursor-pointer"
-              >
-                <img src="@/assets/svg/icon/plus.svg" alt="" />
-              </p>
-            </div>
-          </div>
-          <div
-            class="space-y-[10px]"
-            v-if="
-              isLoading.user.data.current_role != 'methodological' &&
-              isLoading.user.data.current_role != 'parents' &&
-              isLoading.user.data.current_role != 'director' &&
-              isLoading.user.data.current_role != 'admin'
-            "
-          >
-            <h1>Sinfingizni tanlang</h1>
-            <div
-              v-for="(i, index) in useSettings.user.class"
-              class="flex justify-between"
-            >
-              <div class="flex items-center gap-2">
-                <a-select
-                  v-model:value="useSettings.user.class[index][0]"
-                  @change="handleChange"
-                  class="min-w-[145px] sr_12"
-                  :options="sinf.map((pro) => ({ value: pro }))"
-                  required
-                >
-                  <template #suffixIcon>
-                    <p class="h-4 w-[1px] bg-[#999999]"></p>
-                    <img
-                      class="ml-2"
-                      src="@/assets/svg/icon/select_arrow6c.svg"
-                      alt=""
-                    />
-                  </template>
-                </a-select>
-                <p class="h-[1px] w-4 bg-[#CCCCCC]"></p>
-                <a-select
-                  v-model:value="useSettings.user.class[index][1]"
-                  @change="handleChange"
-                  class="min-w-[115px] sr_12"
-                  :options="sinf_type.map((pro) => ({ value: pro }))"
-                  required
-                >
-                  <template #suffixIcon>
-                    <p class="h-4 w-[1px] bg-[#999999]"></p>
-                    <img
-                      class="ml-2"
-                      src="@/assets/svg/icon/select_arrow6c.svg"
-                      alt=""
-                    />
-                  </template>
-                </a-select>
-              </div>
-              <p
-                v-if="isLoading.user.data.current_role == 'teacher'"
-                @click="add_class"
-                class="full_flex w-[50px] h-[50px] rounded-full border border-[#CCCCCC] cursor-pointer"
-              >
-                <img src="@/assets/svg/icon/plus.svg" alt="" />
-              </p>
-            </div>
-          </div>
-          <div class="flex items-center gap-10">
-            <div
-              @click="useSettings.user.gender = 'MALE'"
-              class="flex items-center gap-[6px] cursor-pointer"
-            >
-              <img
-                v-if="useSettings.user.gender == 'MALE'"
-                class="h-3 w-3 object-cover"
-                src="@/assets/svg/settings/radio.svg"
-                alt=""
-              />
-              <p
-                v-else
-                class="h-3 w-3 border border-[#C1C1C1] rounded-full"
-              ></p>
-              <p>Erkak</p>
-            </div>
-            <div
-              @click="useSettings.user.gender = 'FEMALE'"
-              class="flex items-center gap-[6px] cursor-pointer"
-            >
-              <p
-                v-if="useSettings.user.gender == 'MALE'"
-                class="h-3 w-3 border border-[#C1C1C1] rounded-full"
-              ></p>
-              <img
-                v-else
-                class="h-3 w-3 object-cover"
-                src="@/assets/svg/settings/radio.svg"
-                alt=""
-              />
-              <p>Ayol</p>
-            </div>
-          </div>
           <input
             v-model="useSettings.user.phone"
             class="bg-[#F9F9F9]"
@@ -428,12 +274,18 @@ definePageMeta({
 });
 import { regions } from "@/assets/json/regions.js";
 import { district } from "@/assets/json/districts.js";
-import { useSettingsStore, useUserStore, useLoadingStore } from "~/store";
+import {
+  useSettingsStore,
+  useUserStore,
+  useLoadingStore,
+  usePaymentStore,
+} from "~/store";
 
 const sinf = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
 const sinf_type = ["A", "B", "C", "D", "E", "F", "G", "H", "I"];
 const provinceData = ["Matematika", "Biologiya", "Kimyo"];
 const useSettings = useSettingsStore();
+const usePayment = usePaymentStore();
 const useUser = useUserStore();
 const isLoading = useLoadingStore();
 
@@ -474,6 +326,18 @@ function handleRegion(data) {
   }
 }
 
+function getLastDates(date) {
+  const date1 = new Date("2024-07-27");
+  const date2 = new Date("2024-08-27");
+  const monthDifference = date2 - date1;
+  const daysInMonth = Math.floor(monthDifference / (1000 * 60 * 60 * 24));
+  const startDate = new Date(date);
+  const currentDate = new Date();
+  const timeDifference = currentDate - startDate;
+  const daysDifference = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+  return daysDifference + " / " + daysInMonth;
+}
+
 watch(
   () => useSettings.user.gender,
   () => {
@@ -493,6 +357,7 @@ onBeforeMount(() => {
   useUser.store.subject_step =
     isLoading.user.current_role_data.subjects?.length;
   useSettings.getProfile();
+  usePayment.getByRoleId();
 });
 </script>
 

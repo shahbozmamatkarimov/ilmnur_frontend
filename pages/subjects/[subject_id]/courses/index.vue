@@ -50,7 +50,7 @@
       <UiFullLoading v-for="i in 6" class="!h-[168px]" />
     </section>
     <section v-else-if="useCourse.store.membership?.length">
-      <h1 class="text-xl font-bold">Kurslingizni yakunlang</h1>
+      <h1 class="text-xl font-bold">Kursingizni yakunlang</h1>
       <p class="mt-1 mb-5 _c92">Sizning eng yaxshi tanlovlaringiz.</p>
       <div class="grid xl:grid-cols-3 gap-5 mt-3">
         <div
@@ -76,7 +76,7 @@
               </h1>
               <el-progress
                 class="class_progress mb-2 mt-6"
-                :percentage="i.user_step"
+                :percentage="(i.user_step * 100) / i.lesson_count"
               />
               <p class="_c92 text-sm mb-1">
                 {{ i.user_step }}/{{ i.lesson_count }} Videos Completed
@@ -327,7 +327,39 @@
             />
           </label>
         </div>
-        <div v-if="useCourse.create.type == 'paid'" class="space-y-2">
+        <h2 v-if="['paid', 'private'].includes(useCourse.create.type)">Kursni sotib olish</h2>
+        <div 
+        v-if="['paid', 'private'].includes(useCourse.create.type)" class="grid grid-cols-3 gap-4">
+          <label
+            for="monthly"
+            class="full_flex !justify-between gap-5 border_ced r_8 py-3 px-6"
+          >
+            <p>Oylik</p>
+            <input
+              v-model="useCourse.create.price_type"
+              type="radio"
+              value="monthly"
+              name="price_type"
+              id="monthly"
+              class="h-5 w-5"
+            />
+          </label>
+          <label
+            for="foreover"
+            class="full_flex !justify-between gap-5 border_ced r_8 py-3 px-6"
+          >
+            <p>Cheksiz</p>
+            <input
+              v-model="useCourse.create.price_type"
+              type="radio"
+              value="foreover"
+              name="price_type"
+              id="foreover"
+              class="h-5 w-5"
+            />
+          </label>
+        </div>
+        <div v-if="['paid', 'private'].includes(useCourse.create.type)" class="space-y-2">
           <label for="price">Kurs narxi</label>
           <input
             v-model="useCourse.create.price"
@@ -336,7 +368,7 @@
             type="number"
           />
         </div>
-        <div v-if="useCourse.create.type == 'paid'" class="space-y-2">
+        <div v-if="['paid', 'private'].includes(useCourse.create.type)" class="space-y-2">
           <label for="discount">Chegirma</label>
           <input
             v-model="useCourse.create.discount"
@@ -455,72 +487,134 @@
       </div>
       <div>
         <UiButton
-          v-if="store.course_data.type == 'free'"
+          v-if="store.course_data.type == 'free' || store.is_member"
           @click="routeToLessons"
           class="login_btn w-full mt-4"
           ><span v-if="store.is_member">Continue</span
           ><span v-else>Join to group</span></UiButton
         >
-        <UiButton
-          v-else-if="store.course_data.type == 'paid'"
-          @click="routeToLessons"
-          class="login_btn w-full mt-4"
-          >Adminga yozish</UiButton
+        <a
+          v-else-if="
+            store.course_data.type == 'paid' &&
+            isLoading.user.data.current_role != 'teacher' &&
+            !isLoading.user.current_role_data.subjects?.includes(
+              $router.currentRoute.value.params.subject_id
+            )
+          "
+          href="http://t.me/shakhboz23"
+          target="_blank"
+          rel="noopener noreferrer"
         >
+          <UiButton @click="routeToLessons" class="login_btn w-full mt-4"
+            >Adminga yozish</UiButton
+          >
+        </a>
         <a-dropdown
-          v-else-if="store.course_data.type == 'private'"
+          v-else-if="
+            (store.course_data.type == 'private' ||
+              store.course_data.type == 'paid') &&
+            isLoading.user.data.current_role == 'teacher' &&
+            isLoading.user.current_role_data.subjects?.includes(
+              $router.currentRoute.value.params.subject_id
+            )
+          "
           :trigger="['click']"
           class="!max-h-[80vh]"
-          v-model:open="store.visible"
+          v-model:open="useCourse.store.addMember"
           placement="top"
         >
           <UiButton class="login_btn w-full mt-4">Add member</UiButton>
           <template #overlay>
             <a-menu
-              class="!max-h-[50vh] !-mb-14 relative overflow-hidden overflow-y-auto space-y-0.5"
+              class="!min-h-screen relative overflow-hidden overflow-y-auto space-y-0.5"
             >
-              <input
-                @input="useUser.searchUsers"
-                id="search_user"
-                type="text"
-                v-model="useUser.store.search_input"
-                class="sticky top-0 z-10 mb-2"
-                placeholder="Search"
-              />
-              <a-menu-item
-                @click="addMember(user.role[0]?.id)"
-                v-for="user in useUser.store.search_users"
-                :class="
-                  useCourse.addmember.role_id.includes(user.role[0]?.id)
-                    ? 'bg_orange !text-white'
-                    : ''
-                "
-              >
-                <ul class="flex items-center gap-2">
-                  <li>
-                    <img
-                      v-if="user.role[0]?.image"
-                      class="h-8 w-8 rounded-full object-cover"
-                      :src="user.role[0]?.image"
-                      alt=""
-                    />
-                    <UiAvatarEmpty v-else class="max-w-[32px] max-h-[32px]" />
-                  </li>
-                  <li>{{ user.name }} {{ user.surname }}</li>
-                </ul>
+              <a-menu-item class="!bg-white">
+                <input
+                  @input="useUser.searchUsers"
+                  id="search_user"
+                  type="text"
+                  v-model="useUser.store.search_input"
+                  class="sticky top-0 z-10 mb-2"
+                  placeholder="Search"
+                />
+                <div
+                  class="w-[98vw] min-h-[calc(100vh_-_140px)] max-h-[calc(100vh_-_140px)] overflow-y-auto"
+                >
+                  <table class="table-auto mt-5 w-full">
+                    <thead>
+                      <tr class="text-sm b_cff3 whitespace-nowrap">
+                        <th class="text-start font-medium _c66 px-5 py-3">№</th>
+                        <th class="text-start font-medium _c66 px-5 py-3">
+                          Ism
+                        </th>
+                        <th class="text-start font-medium _c66 px-5 py-3">
+                          Boshlanish sanasi
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        @click="
+                          addMember(
+                            user.role[0]?.id,
+                            useCourse.store.user_dates[0]
+                          )
+                        "
+                        v-for="(user, u_index) in useUser.store.search_users"
+                        class="p-1 mb-0.5 rounded-lg border-b"
+                        :class="
+                          useCourse.addmember.role_id.includes(user.role[0]?.id)
+                            ? 'bg_orange !text-white'
+                            : ''
+                        "
+                      >
+                        <td class="py-2 px-5 text-sm">
+                          #{{ user.role[0]?.id }}
+                        </td>
+                        <td class="py-2 px-5">
+                          <div class="flex items-center h-full gap-2">
+                            <img
+                              v-if="user.role[0]?.image"
+                              class="h-8 w-8 rounded-full object-cover"
+                              :src="user.role[0]?.image"
+                              alt=""
+                            />
+                            <UiAvatarEmpty
+                              v-else
+                              class="max-w-[32px] max-h-[32px]"
+                            />
+                            <p>
+                              {{ user.name }}
+                              {{ user.surname }}
+                            </p>
+                          </div>
+                        </td>
+                        <td class="py-2 px-5 h-10">
+                          <a-date-picker
+                            class="h-10"
+                            v-model:value="useCourse.store.user_dates[0]"
+                            placeholder="0000-00-00"
+                            format="YYYY-MM-DD"
+                          />
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="flex">
+                  <UiButton
+                    class="w-full mt-4"
+                    @click="useCourse.store.addMember = false"
+                    >Cancel</UiButton
+                  >
+                  <UiButton
+                    v-loading="isLoading.isLoadingType('addMember')"
+                    @click="useCourse.addMember"
+                    class="login_btn w-full mt-4"
+                    >Add</UiButton
+                  >
+                </div>
               </a-menu-item>
-              {{ useCourse.addmember.role_id }}
-              <div class="flex">
-                <UiButton class="w-full mt-4" @click="store.visible = false"
-                  >Cancel</UiButton
-                >
-                <UiButton
-                  v-loading="isLoading.isLoadingType('addMember')"
-                  @click="useCourse.addMember"
-                  class="login_btn w-full mt-4"
-                  >Add</UiButton
-                >
-              </div>
             </a-menu>
           </template>
         </a-dropdown>
@@ -606,13 +700,14 @@ const store = reactive({
   is_member: false,
 });
 
-function addMember(id) {
+function addMember(id, date) {
   if (useCourse.addmember.role_id.includes(id)) {
     const index = useCourse.addmember.role_id.indexOf(id);
-    console.log(index);
     useCourse.addmember.role_id.splice(index, index + 1);
+    useCourse.addmember.dates.splice(index, index + 1);
   } else {
     useCourse.addmember.role_id.push(id);
+    useCourse.addmember.dates.push(date);
   }
 }
 

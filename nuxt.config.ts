@@ -37,6 +37,9 @@ export default defineNuxtConfig({
         //   src: "../node_modules/@ckeditor/ckeditor5-vue/dist/ckeditor.js",
         // },
         {
+          src: "https://accounts.google.com/gsi/client",
+        },
+        {
           src: "https://cdn.jsdelivr.net/npm/vue-webrtc-v1@3.0.1/dist/vue-webrtc.esm.min.js",
         },
         {

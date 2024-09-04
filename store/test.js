@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { useLoadingStore, useContentStore } from "@/store";
+import { useLoadingStore, useContentStore, useGroupStore } from "@/store";
 import { useNotification } from "@/composables";
 import axios from "axios";
 
@@ -9,6 +9,7 @@ export const useTestStore = defineStore("test", () => {
   const baseUrl = runtime.public.baseURL;
   const isLoading = useLoadingStore();
   const useContent = useContentStore();
+  const useGroup = useGroupStore();
   const router = useRouter();
 
   const store = reactive({
@@ -21,9 +22,65 @@ export const useTestStore = defineStore("test", () => {
     questions_count: 10,
     slideStep: 0,
     isTestEnd: false,
+    group_username: "",
+    errorMessage: false,
+    test_errors: "",
+    time: {
+      days: 0,
+      hours: 0,
+      minutes: 0,
+      seconds: 0,
+      percentage: 0,
+    },
+  });
+
+  const test_settings = reactive({
+    start_date: "",
+    end_date: "",
+    sort_level: "",
+    test_count: "",
+    period: "",
+  });
+
+  const route_types = {
+    t: "tests",
+    g: "group_test",
+  };
+
+  const check_user = reactive({
+    user_id: "",
+    code: "",
   });
 
   const test = reactive({});
+
+  function setTestTime() {
+    let countDownDate = new Date().getTime() + useGroup.store.getUsers.group_test_settings[0]?.period * 60 * 1000; 
+    let now = new Date().getTime();
+    let totalTime = countDownDate - now;
+    store.timeInterval = setInterval(function () {
+      let now = new Date().getTime();
+      let distance = countDownDate - now;
+      store.time.days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      store.time.hours = Math.floor(
+        (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+      );
+      store.time.minutes = Math.floor(
+        (distance % (1000 * 60 * 60)) / (1000 * 60)
+      );
+      console.log(store.time.minutes);
+      store.time.seconds = Math.floor((distance % (1000 * 60)) / 1000);
+      store.time.percentage = (distance / totalTime) * 100;
+
+      if (distance < 0) {
+        store.time.days = 0;
+        store.time.hours = 0;
+        store.time.minutes = 0;
+        store.time.seconds = 0;
+        clearInterval(store.timeInterval);
+      }
+    }, 1000);
+  }
 
   function addTestData() {
     for (let i = 1; i <= store.maxTests; i++) {
@@ -39,13 +96,21 @@ export const useTestStore = defineStore("test", () => {
   addTestData();
 
   function getTests() {
-    let class_name;
-    let subject;
-    class_name = router.currentRoute.value.query.class;
-    const test_id = router.currentRoute.value.params.test_id;
+    let type;
+    let test_id = router.currentRoute.value.query.t;
+    if (test_id) {
+      type = "t";
+    } else {
+      type = "g";
+      test_id = router.currentRoute.value.query.g;
+    }
+    isLoading.addLoading("getTests");
     axios
-      .get(baseUrl + `tests/${test_id}`)
+      .get(baseUrl + `${route_types[type]}/${test_id}`)
       .then((res) => {
+        if (useGroup.store.getUsers.group_test_settings[0]?.period > 0) {
+          setTestTime()
+        }
         console.log(res);
         if (res.data.statusCode == 200) {
           store.tests = res.data.data;
@@ -53,10 +118,13 @@ export const useTestStore = defineStore("test", () => {
           store.tests = [];
           // openNotification(res.data.message);
         }
+        isLoading.removeLoading("getTests");
       })
       .catch((err) => {
         console.log(err);
         store.tests = [];
+        store.test_errors = err.response?.data?.message;
+        isLoading.removeLoading("getTests");
         // openNotification(err?.response?.data?.message);
       });
   }
@@ -81,14 +149,44 @@ export const useTestStore = defineStore("test", () => {
       });
   }
 
+  function check_userApi() {
+    const id = router.currentRoute.value.query.g;
+    axios
+      .post(baseUrl + `group/checkuser/${id}`, check_user)
+      .then((res) => {
+        console.log(res);
+        if (res.data.data == "Verified successfully") {
+          store.group_username = res.data.user.full_name;
+          getTests();
+        }
+        store.errorMessage = "";
+      })
+      .catch((err) => {
+        console.log(err);
+        store.errorMessage = err.response.data.message;
+      });
+  }
+
   function checkAnswers(true_asnwers) {
     isLoading.addLoading("checkAnswers");
     const lesson_id = +router.currentRoute.value.params.id;
+    let type;
+    let url, data;
+    let test_id = +router.currentRoute.value.query.t;
+    if (test_id) {
+      type = "t";
+      url =
+        `${route_types[type]}/check_answers/` +
+        isLoading.user.current_role_data.id;
+      data = { answers: true_asnwers, lesson_id: test_id };
+    } else {
+      type = "g";
+      test_id = +router.currentRoute.value.query.g;
+      url = `${route_types[type]}/check_answers/` + store.group_username;
+      data = { answers: true_asnwers, group_id: test_id };
+    }
     axios
-      .post(
-        baseUrl + `tests/check_answers/` + isLoading.user.current_role_data.id,
-        { answers: true_asnwers, lesson_id }
-      )
+      .post(baseUrl + url, data)
       .then((res) => {
         // store.testResModal = true;
         store.isTestEnd = true;
@@ -111,8 +209,15 @@ export const useTestStore = defineStore("test", () => {
   async function createTest() {
     console.log(test);
     isLoading.addLoading("createTest");
-    const lesson_id = +router.currentRoute.value.query.lesson_id;
-    let url = "/lessons/Matematika/" + lesson_id + "/test";
+    let lesson_id, group_id;
+    let url;
+    if (router.currentRoute.value.query.lesson_id) {
+      lesson_id = +router.currentRoute.value.query.lesson_id;
+      url = `/test?t=${lesson_id}`;
+    } else {
+      group_id = +router.currentRoute.value.query.group_id;
+      url = `/test?g=${group_id}`;
+    }
     for (let i = 1; i <= store.questions_count; i++) {
       try {
         const tempElement = document.createElement("div");
@@ -152,25 +257,68 @@ export const useTestStore = defineStore("test", () => {
       } catch (err) {
         console.log(err);
       }
+    }
+    if (lesson_id) {
       await axios
         .post(baseUrl + `tests/create`, {
+          ...test_settings,
           lesson_id,
-          variants: Object.values(test[i].variant),
-          question: test[i].question[0],
+          test,
+          // variants: Object.values(test[i].variant),
+          // question: test[i].question[0],
         })
         .then((res) => {
           console.log(res);
-          showMessage("Uploaded successfully " + i);
+          showMessage("Uploaded successfully");
           isLoading.removeLoading("createTest");
         })
         .catch((err) => {
-          console.log(err);
-          showMessage(err?.response?.data?.message + " " + i);
+          showMessage(err?.response?.data?.message);
           isLoading.removeLoading("createTest");
         });
+    } else {
+      await axios
+        .post(baseUrl + `group_test/create`, {
+          ...test_settings,
+          group_id,
+          test,
+        })
+        .then((res) => {
+          console.log(res);
+          showMessage("Uploaded successfully");
+          isLoading.removeLoading("createTest");
+        })
+        .catch((err) => {
+          showMessage(err?.response?.data?.message);
+          isLoading.removeLoading("createTest");
+        });
+    }
+
+    let test_settings2 = {
+      start_date: "",
+      end_date: "",
+      sort_level: "",
+      test_count: "",
+    };
+
+    for (let i in test_settings2) {
+      test_settings[i] = test_settings2[i];
+    }
+    if (router.currentRoute.value.query.group_id) {
+      useGroup.addGroupstep(router.currentRoute.value.query.group_id);
     }
     router.push(url);
   }
 
-  return { store, test, getTests, checkAnswers, createTest, nextLesson };
+  return {
+    store,
+    test,
+    test_settings,
+    getTests,
+    checkAnswers,
+    createTest,
+    nextLesson,
+    check_user,
+    check_userApi,
+  };
 });

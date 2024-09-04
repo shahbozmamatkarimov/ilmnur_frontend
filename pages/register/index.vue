@@ -1,34 +1,50 @@
 <template>
-  <main class="py-10 md:px-0 px-4 max-h-screen min-h-[calc(100vh_-_100px)] overflow-y-auto">
-    <div class="sm:w-[500px] bg_white mx-auto sm:p-[50px] p-5 pb-8 rounded-[16px]">
+  <main
+    class="py-10 md:px-0 px-4 max-h-screen min-h-[calc(100vh_-_100px)] overflow-y-auto"
+  >
+    <div
+      class="sm:w-[500px] bg_white mx-auto sm:p-[50px] p-5 pb-8 rounded-[16px]"
+    >
       <h1 class="text-center md:text-[28px] mb-7 text-xl font-bold">
         Roʻyxatdan oʻtish
       </h1>
       <form @submit.prevent="useAuth.authRegister" class="space-y-6 text-sm">
         <div class="space-y-2">
           <label for="name">Ism</label>
-          <input v-model="useAuth.register.name" id="name" type="text">
+          <input v-model="useAuth.register.name" id="name" type="text" />
         </div>
         <div class="space-y-2">
           <label for="surname">Familiya</label>
-          <input v-model="useAuth.register.surname" id="surname" type="text">
+          <input v-model="useAuth.register.surname" id="surname" type="text" />
         </div>
         <div class="space-y-2">
           <label for="email">Email</label>
-          <input v-model="useAuth.register.email" id="email" type="email">
+          <input v-model="useAuth.register.email" id="email" type="email" />
           <p class="!mt-1 text-xs">Emailingizga tasdiqlash kodi jo'natiladi</p>
         </div>
         <div class="space-y-2">
           <label for="password">Parol</label>
           <div class="flex relative">
-            <input v-model="useAuth.register.password" id="password" type="password" class="pr-10">
-            <img class="absolute top-0 right-0 p-4 cursor-pointer" src="@/assets/svg/icon/show.svg" alt="">
+            <input
+              v-model="useAuth.register.password"
+              id="password"
+              type="password"
+              class="pr-10"
+            />
+            <img
+              class="absolute top-0 right-0 p-4 cursor-pointer"
+              src="@/assets/svg/icon/show.svg"
+              alt=""
+            />
           </div>
         </div>
+        <div id="googleButton"></div>
         <div class="pt-8 space-y-6 grid">
           <button class="login_btn mx-auto">Keyingi</button>
-          <router-link class="text-[#2E9AFF] max-w-fit mx-auto border-b border-[#2E9AFF] text-end font-medium"
-            to="/login">
+          <router-link
+            class="text-[#2E9AFF] max-w-fit mx-auto border-b border-[#2E9AFF] text-end font-medium"
+            to="/login"
+          >
             Oldin ro'yhatdan o'tganmisiz?
           </router-link>
         </div>
@@ -48,14 +64,14 @@ const useAuth = useAuthStore();
 const isLoading = useLoadingStore();
 isLoading.store.verification = true;
 
-useAuth.register.role = 'student';
+useAuth.register.role = "student";
 
 const store = reactive({
   show: false,
 });
 
 function getCodeBoxElement(index) {
-  return document.getElementById('codeBox' + index);
+  return document.getElementById("codeBox" + index);
 }
 
 function onKeyUpEvent(index, event) {
@@ -66,7 +82,7 @@ function onKeyUpEvent(index, event) {
     } else {
       getCodeBoxElement(index).blur();
       // Submit code
-      console.log('submit code ');
+      console.log("submit code ");
     }
   }
   if (eventCode === 8 && index !== 1) {
@@ -83,6 +99,30 @@ function onFocusEvent(index) {
     }
   }
 }
+
+function handleCredentialResponse(response) {
+  console.log(response);
+  // handle API calls same as above
+}
+
+onMounted(() => {
+  google.accounts.id.initialize({
+    client_id:
+      "1052636609273-5b35pkatqdgnvm2pf364efpmrjo0om1m.apps.googleusercontent.com",
+    callback: handleCredentialResponse, //method to run after user clicks the Google sign in button
+    context: "signin",
+  });
+
+  // render button
+  google.accounts.id.renderButton(document.getElementById("googleButton"), {
+    type: "standard",
+    size: "large",
+    text: "signin_with",
+    shape: "rectangular",
+    logo_alignment: "center",
+    width: 250,
+  });
+});
 </script>
 
 <style lang="scss" scoped>
@@ -90,7 +130,7 @@ function onFocusEvent(index) {
 body {
   text-align: center;
   background-color: lightcyan;
-  font-family: 'POPPINS', Open-Sans;
+  font-family: "POPPINS", Open-Sans;
   background: linear-gradient(to right, #4568dc, #b06ab3);
 }
 
@@ -99,7 +139,6 @@ body {
 }
 
 // Body Styling only End ================
-
 
 // Container-fluid Styling only Begin ===
 .container-fluid {
@@ -111,7 +150,6 @@ body {
 }
 
 // Container-fluid Styling only End =====
-
 
 // =====
 // Passcode-wrapper Styling only Begin ==
@@ -151,4 +189,5 @@ body {
   }
 }
 
-// Passcode-wrapper Styling only End ====</style>
+// Passcode-wrapper Styling only End ====
+</style>

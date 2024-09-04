@@ -48,8 +48,8 @@
             <p>
               Sinf:
               <span class="font-semibold"
-                >{{ useClass.store.class_name[0] }}-{{
-                  useClass.store.class_name[1]
+                >{{ useGroup.store.class_name[0] }}-{{
+                  useGroup.store.class_name[1]
                 }}</span
               >
             </p>
@@ -62,7 +62,7 @@
           <p class="font-medium !-mb-2">
             O‘quvchilar:
             <span class="font-semibold"
-              >{{ useClass.store.my_classes?.length }} ta</span
+              >{{ useGroup.store.my_classes?.length }} ta</span
             >
           </p>
           <section class="overflow-x-auto">
@@ -83,7 +83,7 @@
               <tbody>
                 <tr
                   class="border-b border-[#EDEDED]"
-                  v-for="i in useClass.store.my_classes"
+                  v-for="i in useGroup.store.my_classes"
                 >
                   <td class="py-6 px-5 text-sm">#{{ i.id }}</td>
                   <td class="py-6 px-5">
@@ -130,23 +130,23 @@ definePageMeta({
   layout: "search",
 });
 
-import { useLoadingStore, useClassStore } from "~/store";
+import { useLoadingStore, useGroupStore } from "~/store";
 
 const isLoading = useLoadingStore();
-const useClass = useClassStore();
+const useGroup = useGroupStore();
 
 const store = reactive({
   is_open: false,
 });
 
 function getClassStudent(data) {
-  useClass.store.class_name = data;
+  useGroup.store.class_name = data;
   store.is_open = true;
-  useClass.getTeacherClass();
+  useGroup.getTeacherClass();
 }
 
 onBeforeMount(() => {
-  useClass.getTeacherClass();
+  useGroup.getTeacherClass();
 });
 </script>
 

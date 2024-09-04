@@ -161,20 +161,10 @@ onBeforeMount(() => {
 });
 
 function getLastDates(date) {
-  // const today = new Date(date);
-  // const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-  // const daysInMonth = endOfMonth.getDate();
   const date1 = new Date("2024-07-27");
-
-  // Sana 2: 27.08.2024
   const date2 = new Date("2024-08-27");
-
-  // Millisekundlar farqini hisoblang
   const monthDifference = date2 - date1;
-
-  // Millisekundlarni kunlarga aylantiring
   const daysInMonth = Math.floor(monthDifference / (1000 * 60 * 60 * 24));
-
   const startDate = new Date(date);
   const currentDate = new Date();
   const timeDifference = currentDate - startDate;
