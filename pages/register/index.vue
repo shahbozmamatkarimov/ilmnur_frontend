@@ -101,20 +101,11 @@ function onFocusEvent(index) {
   }
 }
 
-function handleCredentialResponse(response) {
-  console.log(response);
-  const credential = response.credential;
-  console.log("Google Credential:", credential);
-
-  // Send the credential to your backend for verification
-  useAuth.verifyGoogleCredential(credential);
-}
-
 
 onMounted(() => {
   google.accounts.id.initialize({
     client_id: runtime.public.client_id,
-    callback: handleCredentialResponse, //method to run after user clicks the Google sign in button
+    callback: useAuth.verifyGoogleCredential, //method to run after user clicks the Google sign in button
     context: "signin",
   });
 

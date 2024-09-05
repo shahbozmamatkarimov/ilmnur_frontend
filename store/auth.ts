@@ -244,34 +244,20 @@ export const useAuthStore = defineStore("auth", () => {
       });
   }
 
-  async function verifyGoogleCredential(credential: string) {
+  async function verifyGoogleCredential(response: any) {
+    const credential = response.credential;
     apiRequest
       .post("user/auth/google", { credential })
       .then((res: any) => {
         console.log(res);
+        localStorage.setItem("token", res.data.token);
+        if (res.data.statusCode == 200) {
+          router.push("/reyting");
+        }
       })
       .catch((err) => {
         console.log(err);
       });
-    // try {
-    //   // const { error, data } = await useFetch("/api/auth/google", {
-    //   //   method: "POST",
-    //   //   body: {
-    //   //     credential,
-    //   //   },
-    //   // });
-
-    //   // console.log("Backend Response:", data.value);
-    //   // console.log("Backend Response:", error.value);
-    //   // if (error.value) {
-    //   //   console.error("Error:", error.value);
-    //   // } else {
-    //   //   console.log("Backend Response:", data.value);
-    //   // }
-    //   // Handle the response, e.g., save the user session or token
-    // } catch (error) {
-    //   console.error("Error verifying Google credential:", error);
-    // }
   }
 
   return {
